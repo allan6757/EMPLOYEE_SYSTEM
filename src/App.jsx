@@ -1,631 +1,866 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import Header from './components/Layout/Header';
+import ServiceCard from './components/Layout/ServiceCard';
+import EmployeeLogin from './components/Employee/EmployeeLogin';
+import EmployeeDashboard from './components/Employee/EmployeeDashboard';
+import CitizenServices from './components/Citizen/CitizenServices';
+import RegistrationForm from './components/Registration/RegistrationForm';
+import AdminDashboard from './components/Admin/AdminDashboard';
+import Popup from './components/Layout/Popup';
+import SidePanel from './components/Layout/SidePanel';
+import CitizenLogin from './components/Citizen/CitizenLogin';
+import LoginScreen from './components/Auth/LoginScreen';
+import { useLocalStorage } from './hooks/useLocalStorage';
+import { 
+  getFormattedDate, 
+  getFormattedTime, 
+  generateQueueNumber, 
+  generateIdNumber, 
+  findOptimalBooth, 
+  runFraudChecks 
+} from './utils/helpers';
+import { globalStyles } from './styles/globalStyles';
 
-// Modern, clean, mildly futuristic UI + Suggestion Box feature
 const App = () => {
-  const appId = 'local-app-id';
+  const appId = 'registration-bureau-app';
+  const ADMIN_PASSWORD = 'allan123';
+  const SECURITY_KEY = 'ALLAN123';
 
-  // State for attendance
-  const [employeeIdInput, setEmployeeIdInput] = useState('');
-  const [employeeNameInput, setEmployeeNameInput] = useState('');
-  const [viewMode, setViewMode] = useState('employee');
-  const [attendanceRecords, setAttendanceRecords] = useState([]);
+  // Authentication & User State
+  const [currentUser, setCurrentUser] = useState(null);
+  const [loginForm, setLoginForm] = useState({ boothId: '', password: '' });
+  const [viewMode, setViewMode] = useState('login');
   const [message, setMessage] = useState('');
-
-  // State for employer password protection
   const [isPasswordPromptVisible, setIsPasswordPromptVisible] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
-  const EMPLOYER_PASSWORD = 'allan123';
+  const [showEmployeeLogin, setShowEmployeeLogin] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [currentCitizen, setCurrentCitizen] = useState(null);
+  const [citizenLoginForm, setCitizenLoginForm] = useState({ idNumber: '', phoneNumber: '' });
+  const [showCitizenLogin, setShowCitizenLogin] = useState(false);
+  const [showDigitalID, setShowDigitalID] = useState(false);
+  const [lostReports, setLostReports] = useLocalStorage(`lostReports_${appId}`, []);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [mainLoginForm, setMainLoginForm] = useState({ identifier: '', password: '' });
+  const [showSecurityPrompt, setShowSecurityPrompt] = useState(false);
+  const [securityKey, setSecurityKey] = useState('');
+  const [pendingAction, setPendingAction] = useState(null);
 
-  // Suggestion Box state
-  const [suggestionInput, setSuggestionInput] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
+  // Sample data
+  const sampleBooths = [
+    { id: 'B001', name: 'ID Verification Booth 1', serviceType: 'new-id' },
+    { id: 'B002', name: 'Replacement Services Booth', serviceType: 'replacement' },
+    { id: 'B003', name: 'Correction Services Booth', serviceType: 'correction' }
+  ];
 
-  useEffect(() => {
-    try {
-      const storedRecords = JSON.parse(localStorage.getItem(`attendanceRecords_${appId}`));
-      if (storedRecords) setAttendanceRecords(storedRecords);
-      const storedSuggestions = JSON.parse(localStorage.getItem(`suggestions_${appId}`));
-      if (storedSuggestions) setSuggestions(storedSuggestions);
-    } catch (error) {
-      console.error("Error loading from local storage:", error);
+  const sampleEmployees = [
+    { id: 'EMP001', name: 'ALLAN MAINA', password: 'emp123', boothId: 'B002' },
+    { id: 'EMP002', name: 'MARY WANJIKU', password: 'emp456', boothId: 'B001' },
+    { id: 'EMP003', name: 'JOHN KAMAU', password: 'emp789', boothId: 'B003' }
+  ];
+
+  const sampleDocuments = [
+    {
+      id: 1,
+      citizenId: 1,
+      idNumber: '12345678',
+      citizenName: 'JAMES MWANGI',
+      documentType: 'National ID',
+      productionStage: 'ready',
+      orderDate: '2024-01-20',
+      expectedCompletion: '2024-02-01',
+      status: 'completed'
+    },
+    {
+      id: 2,
+      citizenId: 2,
+      idNumber: '87654321',
+      citizenName: 'GRACE NJERI',
+      documentType: 'ID Replacement',
+      productionStage: 'production',
+      orderDate: '2024-10-01',
+      expectedCompletion: '2024-10-15',
+      status: 'in_production'
     }
-  }, [appId]);
+  ];
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(`attendanceRecords_${appId}`, JSON.stringify(attendanceRecords));
-    } catch (error) {
-      console.error("Error saving attendance to local storage:", error);
+  const sampleCitizens = [
+    {
+      id: 1,
+      idNumber: '12345678',
+      firstName: 'JAMES',
+      lastName: 'MWANGI',
+      dateOfBirth: '1990-05-15',
+      placeOfBirth: 'Nairobi',
+      nationality: 'Kenyan',
+      gender: 'Male',
+      phoneNumber: '0712345678',
+      email: 'james.mwangi@email.com',
+      address: 'Nairobi, Kenya',
+      registrationDate: '2024-01-15',
+      issueDate: '2024-02-01',
+      expiryDate: '2034-02-01',
+      status: 'active',
+      documentStatus: 'issued',
+      biometricKey: 'BIO-12345678-2024'
+    },
+    {
+      id: 2,
+      idNumber: '87654321',
+      firstName: 'GRACE',
+      lastName: 'NJERI',
+      dateOfBirth: '1985-08-22',
+      placeOfBirth: 'Mombasa',
+      nationality: 'Kenyan',
+      gender: 'Female',
+      phoneNumber: '0723456789',
+      email: 'grace.njeri@email.com',
+      address: 'Mombasa, Kenya',
+      registrationDate: '2024-02-10',
+      issueDate: '2024-03-01',
+      expiryDate: '2025-03-01',
+      status: 'expires_soon',
+      documentStatus: 'issued',
+      biometricKey: 'BIO-87654321-2024'
+    },
+    {
+      id: 3,
+      idNumber: '11223344',
+      firstName: 'PETER',
+      lastName: 'KIPROTICH',
+      dateOfBirth: '1992-12-03',
+      placeOfBirth: 'Eldoret',
+      nationality: 'Kenyan',
+      gender: 'Male',
+      phoneNumber: '0734567890',
+      email: 'peter.kiprotich@email.com',
+      address: 'Eldoret, Kenya',
+      registrationDate: '2024-03-05',
+      issueDate: '2020-04-01',
+      expiryDate: '2024-04-01',
+      status: 'expired',
+      documentStatus: 'expired',
+      biometricKey: 'BIO-11223344-2020'
+    },
+    {
+      id: 4,
+      idNumber: '99887766',
+      firstName: 'MARY',
+      lastName: 'WANJIKU',
+      dateOfBirth: '1988-07-12',
+      placeOfBirth: 'Kisumu',
+      nationality: 'Kenyan',
+      gender: 'Female',
+      phoneNumber: '0745678901',
+      email: 'mary.wanjiku@email.com',
+      address: 'Kisumu, Kenya',
+      registrationDate: '2024-01-20',
+      issueDate: '2024-02-15',
+      expiryDate: '2034-02-15',
+      status: 'active',
+      documentStatus: 'issued',
+      biometricKey: 'BIO-99887766-2024'
+    },
+    {
+      id: 5,
+      idNumber: '55443322',
+      firstName: 'DAVID',
+      lastName: 'OTIENO',
+      dateOfBirth: '1995-03-08',
+      placeOfBirth: 'Nakuru',
+      nationality: 'Kenyan',
+      gender: 'Male',
+      phoneNumber: '0756789012',
+      email: 'david.otieno@email.com',
+      address: 'Nakuru, Kenya',
+      registrationDate: '2024-03-10',
+      issueDate: '2024-04-01',
+      expiryDate: '2034-04-01',
+      status: 'active',
+      documentStatus: 'issued',
+      biometricKey: 'BIO-55443322-2024'
     }
-  }, [attendanceRecords, appId]);
+  ];
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(`suggestions_${appId}`, JSON.stringify(suggestions));
-    } catch (error) {
-      console.error("Error saving suggestions to local storage:", error);
-    }
-  }, [suggestions, appId]);
+  // Force fresh data by clearing localStorage first
+  React.useEffect(() => {
+    localStorage.removeItem(`citizenDatabase_${appId}`);
+    localStorage.removeItem(`booths_${appId}`);
+    localStorage.removeItem(`employees_${appId}`);
+  }, []);
 
-  // Helper functions
-  const getFormattedDate = () => {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
+  // Data Management with localStorage
+  const [booths, setBooths] = useLocalStorage(`booths_${appId}`, sampleBooths);
+  const [employees, setEmployees] = useLocalStorage(`employees_${appId}`, sampleEmployees);
+  const [citizenQueue, setCitizenQueue] = useLocalStorage(`citizenQueue_${appId}`, []);
+  const [appointments, setAppointments] = useLocalStorage(`appointments_${appId}`, []);
+  const [serviceRecords, setServiceRecords] = useLocalStorage(`serviceRecords_${appId}`, []);
+  const [citizenDatabase, setCitizenDatabase] = useLocalStorage(`citizenDatabase_${appId}`, sampleCitizens);
+  const [documentProduction, setDocumentProduction] = useLocalStorage(`documentProduction_${appId}`, sampleDocuments);
+  const [fraudAlerts, setFraudAlerts] = useLocalStorage(`fraudAlerts_${appId}`, []);
+
+  // State Management
+  const [activeBooths, setActiveBooths] = useState(new Set());
+  const [currentServing, setCurrentServing] = useState({});
+  const [chats, setChats] = useState([]);
+  const [showChat, setShowChat] = useState(false);
+  const [newMessage, setNewMessage] = useState('');
+  const [popup, setPopup] = useState(null);
+
+  // Form States
+  const [newBooth, setNewBooth] = useState({ id: '', name: '', serviceType: 'new-id' });
+  const [newEmployee, setNewEmployee] = useState({ id: '', name: '', password: '', boothId: '' });
+  const [citizenForm, setCitizenForm] = useState({
+    name: '', phoneNumber: '', idNumber: '', serviceType: 'new-id', 
+    appointmentDate: '', appointmentTime: ''
+  });
+  const [registrationForm, setRegistrationForm] = useState({
+    firstName: '', lastName: '', dateOfBirth: '', placeOfBirth: '',
+    nationality: 'Kenyan', gender: '', phoneNumber: '', email: '',
+    address: '', nextOfKin: '', fingerprint: '', photo: '', requestBiometric: false
+  });
+  const [biometricSearch, setBiometricSearch] = useState('');
+  const [biometricResults, setBiometricResults] = useState([]);
+  const [showBiometricSearch, setShowBiometricSearch] = useState(false);
+  const [securityFeatures] = useState({
+    hologram: true, watermark: true, rfidChip: true, biometricData: true
+  });
+
+  // Popup function
+  const showPopup = (message, type = 'info') => {
+    setPopup({ message, type });
   };
 
-  const getFormattedTime = () => {
-    const now = new Date();
-    return now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-  };
-
-  // Attendance handlers
-  const handleSignIn = () => {
-    if (!employeeIdInput || !employeeNameInput) {
-      setMessage("Please enter both your Employee ID and Name.");
-      return;
-    }
-    const today = getFormattedDate();
-    const recordExists = attendanceRecords.find(rec => rec.employeeId === employeeIdInput && rec.date === today);
-
-    if (recordExists && recordExists.signInTime) {
-      setMessage(`Employee ID: ${employeeIdInput} has already signed in today.`);
-      return;
-    }
-
-    const newRecord = {
-      employeeId: employeeIdInput,
-      employeeName: employeeNameInput,
-      date: today,
-      signInTime: getFormattedTime(),
-      signOutTime: null,
-      status: 'signed-in',
-    };
-
-    const updatedRecords = recordExists
-      ? attendanceRecords.map(rec => rec.employeeId === employeeIdInput && rec.date === today ? { ...rec, ...newRecord } : rec)
-      : [...attendanceRecords, newRecord];
-
-    updatedRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
-    setAttendanceRecords(updatedRecords);
-    setMessage(`Signed in successfully as ${employeeNameInput} (ID: ${employeeIdInput})`);
-  };
-
-  const handleSignOut = () => {
-    if (!employeeIdInput) {
-      setMessage("Please enter your Employee ID.");
-      return;
-    }
-
-    const today = getFormattedDate();
-    const recordIndex = attendanceRecords.findIndex(rec => rec.employeeId === employeeIdInput && rec.date === today);
-
-    if (recordIndex === -1) {
-      setMessage(`No sign-in record found for Employee ID: ${employeeIdInput} today. Please sign in first.`);
-      return;
-    }
-
-    const updatedRecords = [...attendanceRecords];
-    updatedRecords[recordIndex] = {
-      ...updatedRecords[recordIndex],
-      signOutTime: getFormattedTime(),
-      status: 'present',
-    };
-
-    setAttendanceRecords(updatedRecords);
-    setMessage(`Signed out successfully as Employee ID: ${employeeIdInput}`);
-  };
-
-  const handleMarkAbsent = (employeeId, date) => {
-    const recordIndex = attendanceRecords.findIndex(rec => rec.employeeId === employeeId && rec.date === date);
-
-    if (recordIndex !== -1) {
-      const updatedRecords = [...attendanceRecords];
-      updatedRecords[recordIndex] = {
-        ...updatedRecords[recordIndex],
-        signInTime: null,
-        signOutTime: null,
-        status: 'absent',
-      };
-      setAttendanceRecords(updatedRecords);
-      setMessage(`Marked Employee ID: ${employeeId} as absent on ${date}.`);
+  // Main Authentication
+  const handleMainLogin = (loginData) => {
+    const citizen = citizenDatabase.find(c => 
+      (c.email === loginData.identifier || c.phoneNumber === loginData.identifier) &&
+      loginData.password === 'kenya123'
+    );
+    
+    if (citizen) {
+      setCurrentCitizen(citizen);
+      setIsAuthenticated(true);
+      showPopup(`Welcome ${citizen.firstName} ${citizen.lastName}!`, 'success');
     } else {
-      const newRecord = {
-        employeeId,
-        employeeName: '',
-        date,
-        signInTime: null,
-        signOutTime: null,
-        status: 'absent',
-      };
-      const updatedRecords = [...attendanceRecords, newRecord];
-      updatedRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
-      setAttendanceRecords(updatedRecords);
-      setMessage(`Marked Employee ID: ${employeeId} as absent on ${date}.`);
+      showPopup('Invalid credentials. Try: james.mwangi@email.com / kenya123', 'error');
     }
   };
 
-  const handleEmployerLogin = () => {
-    if (passwordInput === EMPLOYER_PASSWORD) {
-      setViewMode('employer');
-      setIsPasswordPromptVisible(false);
-      setMessage('');
+  // Citizen Authentication
+  const handleCitizenLogin = () => {
+    const citizen = citizenDatabase.find(c => 
+      c.idNumber === citizenLoginForm.idNumber && 
+      c.phoneNumber === citizenLoginForm.phoneNumber
+    );
+    
+    if (citizen) {
+      setCurrentCitizen(citizen);
+      setShowCitizenLogin(false);
+      setViewMode('citizen');
+      showPopup(`Welcome ${citizen.firstName} ${citizen.lastName}!`, 'success');
     } else {
-      setMessage('Incorrect password. Please try again.');
+      showPopup(`Invalid credentials. Try: ID: 12345678, Phone: 0712345678`, 'error');
     }
   };
 
-  // Print attendance records
-  const handlePrintRecords = () => {
-    window.print();
+  // Authentication Functions
+  const handleEmployeeLogin = () => {
+    const booth = booths.find(b => b.id === loginForm.boothId);
+    const employee = employees.find(emp => emp.boothId === loginForm.boothId && emp.password === loginForm.password);
+
+    if (booth && employee) {
+      setCurrentUser({ ...employee, booth });
+      setActiveBooths(prev => new Set([...prev, loginForm.boothId]));
+      setViewMode('employee-dashboard');
+      setShowEmployeeLogin(false);
+      showPopup(`Welcome ${employee.name}! Logged into ${booth.name}`, 'success');
+    } else {
+      showPopup('Invalid booth ID or password.', 'error');
+    }
   };
 
-  // Suggestion Box handlers
-  const handleSuggestionSubmit = () => {
-    if (!suggestionInput.trim()) {
-      setMessage("Please enter a suggestion before submitting.");
+  const handleAdminLogin = () => {
+    if (passwordInput === ADMIN_PASSWORD) {
+      setViewMode('admin');
+      setShowAdminLogin(false);
+      showPopup('Admin access granted', 'success');
+    } else {
+      showPopup('Incorrect admin password', 'error');
+    }
+  };
+
+  const logout = () => {
+    if (currentUser?.boothId) {
+      setActiveBooths(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(currentUser.boothId);
+        return newSet;
+      });
+    }
+    setCurrentUser(null);
+    setViewMode('login');
+    setLoginForm({ boothId: '', password: '' });
+    setShowAdminLogin(false);
+    setPasswordInput('');
+    showPopup('Logged out successfully', 'info');
+  };
+
+  // Security Key Functions
+  const handleSecurityKeySubmit = () => {
+    if (securityKey === SECURITY_KEY) {
+      setShowSecurityPrompt(false);
+      setSecurityKey('');
+      if (pendingAction === 'employee') {
+        setShowEmployeeLogin(true);
+      } else if (pendingAction === 'admin') {
+        setShowAdminLogin(true);
+      }
+      setPendingAction(null);
+    } else {
+      showPopup('Invalid security key', 'error');
+    }
+  };
+
+  const promptSecurityKey = (action) => {
+    setPendingAction(action);
+    setShowSecurityPrompt(true);
+  };
+
+  // Admin Functions
+  const addBooth = () => {
+    if (!newBooth.id || !newBooth.name) {
+      setMessage('Please fill all booth details');
       return;
     }
-    const newSuggestion = {
-      text: suggestionInput,
-      date: getFormattedDate(),
-      time: getFormattedTime(),
-    };
-    setSuggestions([...suggestions, newSuggestion]);
-    setSuggestionInput('');
-    setMessage("Suggestion submitted! Thank you for your feedback.");
-    setTimeout(() => setMessage(''), 2500);
+    if (booths.some(b => b.id === newBooth.id)) {
+      setMessage('Booth ID already exists');
+      return;
+    }
+    setBooths([...booths, { ...newBooth }]);
+    setNewBooth({ id: '', name: '', serviceType: 'new-id' });
+    setMessage('Booth added successfully');
   };
 
-  // Styling: mild black & red futuristic UI
+  const addEmployee = () => {
+    if (!newEmployee.id || !newEmployee.name || !newEmployee.password || !newEmployee.boothId) {
+      setMessage('Please fill all employee details');
+      return;
+    }
+    if (employees.some(e => e.id === newEmployee.id)) {
+      setMessage('Employee ID already exists');
+      return;
+    }
+    if (!booths.some(b => b.id === newEmployee.boothId)) {
+      setMessage('Invalid booth ID');
+      return;
+    }
+    setEmployees([...employees, { ...newEmployee }]);
+    setNewEmployee({ id: '', name: '', password: '', boothId: '' });
+    setMessage('Employee added successfully');
+  };
+
+  // Citizen Functions
+  const bookAppointment = () => {
+    if (!citizenForm.name || !citizenForm.phoneNumber || !citizenForm.idNumber || 
+        !citizenForm.appointmentDate || !citizenForm.appointmentTime) {
+      setMessage('Please fill all required fields: Name, Phone Number, ID Number, Date and Time');
+      return;
+    }
+
+    const optimalBooth = findOptimalBooth(booths, employees, citizenQueue, citizenForm.serviceType);
+    if (!optimalBooth) {
+      setMessage('No available booth for this service');
+      return;
+    }
+
+    const appointment = {
+      id: Date.now(),
+      ...citizenForm,
+      assignedBooth: optimalBooth.id,
+      boothName: optimalBooth.name,
+      status: 'scheduled',
+      bookingTime: getFormattedTime()
+    };
+
+    setAppointments([appointment, ...appointments]);
+    setCitizenForm({ 
+      name: '', phoneNumber: '', idNumber: '', serviceType: 'new-id', 
+      appointmentDate: '', appointmentTime: '' 
+    });
+    setMessage(`Appointment booked at ${optimalBooth.name}`);
+  };
+
+  // Employee Functions
+  const markAppointmentDone = (appointmentId) => {
+    setAppointments(prev =>
+      prev.map(apt =>
+        apt.id === appointmentId
+          ? { ...apt, status: 'completed', completedTime: getFormattedTime() }
+          : apt
+      )
+    );
+    setMessage('Appointment marked as completed');
+  };
+
+  const updateAppointmentNotes = (appointmentId, notes) => {
+    setAppointments(prev =>
+      prev.map(apt =>
+        apt.id === appointmentId ? { ...apt, notes } : apt
+      )
+    );
+  };
+
+  // Registration Functions
+  const registerCitizen = () => {
+    const requiredFields = ['firstName', 'lastName', 'gender', 'phoneNumber'];
+    const missingFields = requiredFields.filter(field => !registrationForm[field]);
+
+    if (missingFields.length > 0) {
+      setMessage(`Please fill required fields: ${missingFields.join(', ')}`);
+      return;
+    }
+
+    const fraudChecks = runFraudChecks(registrationForm, citizenDatabase);
+
+    if (fraudChecks.some(alert => alert.severity === 'high')) {
+      setFraudAlerts([...fraudAlerts, ...fraudChecks.map(alert => ({
+        ...alert,
+        id: Date.now() + Math.random(),
+        timestamp: getFormattedTime(),
+        applicant: `${registrationForm.firstName} ${registrationForm.lastName}`
+      }))]);
+      setMessage('Registration blocked due to security concerns. Please review fraud alerts.');
+      return;
+    }
+
+    const idNumber = generateIdNumber();
+    const biometricKey = registrationForm.requestBiometric ? `BIO-${idNumber}-${new Date().getFullYear()}` : null;
+    
+    const newCitizen = {
+      id: Date.now(),
+      idNumber,
+      ...registrationForm,
+      biometricKey,
+      registrationDate: getFormattedDate(),
+      registrationTime: getFormattedTime(),
+      status: 'registered',
+      documentStatus: 'pending_production',
+      registeredBy: currentUser?.id || 'system'
+    };
+
+    setCitizenDatabase([newCitizen, ...citizenDatabase]);
+
+    const documentOrder = {
+      id: Date.now(),
+      citizenId: newCitizen.id,
+      idNumber,
+      citizenName: `${registrationForm.firstName} ${registrationForm.lastName}`,
+      documentType: 'National ID',
+      productionStage: 'data_verification',
+      orderDate: getFormattedDate(),
+      expectedCompletion: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      securityFeatures: { ...securityFeatures },
+      status: 'in_production'
+    };
+
+    setDocumentProduction([documentOrder, ...documentProduction]);
+
+    setRegistrationForm({
+      firstName: '', lastName: '', dateOfBirth: '', placeOfBirth: '',
+      nationality: 'Kenyan', gender: '', phoneNumber: '', email: '',
+      address: '', nextOfKin: '', fingerprint: '', photo: '', requestBiometric: false
+    });
+
+    const successMessage = `Citizen registered successfully. ID Number: ${idNumber}${biometricKey ? `. Biometric Key: ${biometricKey}` : ''}`;
+    setMessage(successMessage);
+  };
+
+  // Biometric Search Function
+  const searchBiometric = () => {
+    if (!biometricSearch.trim()) {
+      setBiometricResults([]);
+      return;
+    }
+    
+    const results = citizenDatabase.filter(citizen => 
+      citizen.idNumber.includes(biometricSearch) ||
+      citizen.firstName.toLowerCase().includes(biometricSearch.toLowerCase()) ||
+      citizen.lastName.toLowerCase().includes(biometricSearch.toLowerCase())
+    );
+    
+    setBiometricResults(results);
+  };
+
+  // Chat Functions
+  const sendMessage = () => {
+    if (!newMessage.trim()) return;
+    
+    const message = {
+      id: Date.now(),
+      from: currentUser.name,
+      fromType: 'employee',
+      boothId: currentUser.boothId,
+      message: newMessage,
+      timestamp: getFormattedTime(),
+      date: getFormattedDate()
+    };
+    
+    setChats([...chats, message]);
+    setNewMessage('');
+  };
+
+  const replyToMessage = (messageId, reply) => {
+    const replyMessage = {
+      id: Date.now(),
+      from: 'Admin',
+      fromType: 'admin',
+      replyTo: messageId,
+      message: reply,
+      timestamp: getFormattedTime(),
+      date: getFormattedDate()
+    };
+    
+    setChats([...chats, replyMessage]);
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="app-container">
+        <style>{globalStyles}</style>
+        {popup && (
+          <Popup
+            message={popup.message}
+            type={popup.type}
+            onClose={() => setPopup(null)}
+          />
+        )}
+        <LoginScreen onLogin={handleMainLogin} showPopup={showPopup} />
+      </div>
+    );
+  }
+
   return (
     <div className="app-container">
-      <style>
-        {`
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700&display=swap');
-        body, .app-container {
-          background: #101014;
-          min-height: 100vh;
-          font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
-          color: #fff;
-          margin: 0;
-          padding: 0;
-        }
-        .main-card {
-          background: rgba(25,25,28,0.80);
-          border-radius: 1.3rem;
-          box-shadow: 0 0 30px #dc2626cc, 0 4px 18px #000a;
-          padding: 2rem 1.3rem 1.7rem 1.3rem;
-          max-width: 700px;
-          margin: 3rem auto;
-          border: 1.5px solid #dc2626;
-        }
-        .app-title {
-          font-size: 2.2rem;
-          font-family: 'Orbitron', 'Share Tech Mono', monospace;
-          font-weight: 700;
-          color: #dc2626;
-          margin-bottom: 0.3rem;
-          letter-spacing: 2px;
-          text-shadow: 0 0 20px #dc2626bb, 0 0 3px #fff3;
-        }
-        .app-subtitle {
-          font-size: 1rem;
-          color: #fff;
-          margin-bottom: 1rem;
-          opacity: 0.5;
-        }
-        .view-switcher {
-          display: flex;
-          gap: 1.1rem;
-          justify-content: center;
-          margin-bottom: 2.1rem;
-        }
-        .tab-button {
-          padding: 0.7rem 2rem;
-          border-radius: 9999px;
-          font-size: 1.07rem;
-          font-family: 'Orbitron', 'Share Tech Mono', monospace;
-          font-weight: 700;
-          letter-spacing: 1px;
-          border: none;
-          cursor: pointer;
-          background: #19191c;
-          color: #dc2626;
-          box-shadow: 0 0 8px #dc262650;
-          transition: background 0.18s, color 0.18s;
-        }
-        .tab-button.active {
-          background: #dc2626;
-          color: #fff;
-          box-shadow: 0 0 18px #dc2626, 0 2px 8px #000a;
-        }
-        .tab-button.inactive:hover {
-          background: #311414;
-          color: #fff;
-        }
-        .input-field {
-          padding: 0.7rem 1.1rem;
-          border-radius: 9999px;
-          border: 1.5px solid #dc2626;
-          background: #19191c;
-          color: #dc2626;
-          font-size: 1rem;
-          font-family: 'Share Tech Mono', monospace;
-          margin-bottom: 0.7rem;
-          margin-right: 0.5rem;
-          outline: none;
-          box-shadow: 0 0 5px #dc2626bb;
-          transition: border-color 0.2s, background 0.2s, color 0.2s;
-        }
-        .input-field:focus {
-          border-color: #fff;
-          background: #262626;
-          color: #fff;
-        }
-        .action-button {
-          padding: 0.8rem 1.6rem;
-          font-weight: 700;
-          color: #fff;
-          border-radius: 9999px;
-          background: linear-gradient(90deg,#dc2626 60%, #a10000 100%);
-          border: none;
-          cursor: pointer;
-          margin-right: 0.5rem;
-          font-family: 'Orbitron', Arial, sans-serif;
-          letter-spacing: 1px;
-          font-size: 1.03rem;
-          box-shadow: 0 0 14px #dc2626bb;
-          transition: background 0.2s, color 0.2s;
-        }
-        .action-button:hover {
-          background: linear-gradient(90deg,#fff 20%, #dc2626 100%);
-          color: #dc2626;
-        }
-        .sign-in-button {
-          background: linear-gradient(90deg,#dc2626 70%, #a10000 100%);
-        }
-        .sign-out-button {
-          background: linear-gradient(90deg,#000 20%, #dc2626 100%);
-        }
-        .sign-out-button:hover {
-          background: linear-gradient(90deg,#dc2626 70%, #fff 100%);
-          color: #000;
-        }
-        .message-box {
-          text-align: center;
-          font-size: 1.07rem;
-          font-weight: 500;
-          margin: 1rem 0;
-          padding: 0.7rem;
-          border-radius: 0.5rem;
-          background: rgba(220,38,38,0.14);
-          color: #fff;
-          box-shadow: 0 0 10px #dc2626a0;
-          border: 1px solid #dc2626;
-          letter-spacing: 1px;
-        }
-        .error-message {
-          background: rgba(220,38,38,0.38);
-          color: #fff;
-        }
-        .section-title {
-          font-size: 1.25rem;
-          font-weight: 700;
-          margin-bottom: 1.2rem;
-          text-align: center;
-          color: #dc2626;
-          letter-spacing: 1.2px;
-          text-shadow: 0 0 13px #dc2626bb;
-        }
-        .records-container {
-          overflow-x: auto;
-          background: rgba(0,0,0,0.7);
-          border-radius: 0.8rem;
-          margin-top: 1rem;
-          box-shadow: 0 2px 14px #dc2626bb;
-        }
-        table {
-          min-width: 100%;
-          border-collapse: collapse;
-          background: rgba(20,20,20,0.96);
-          color: #fff;
-          border-radius: 0.5rem;
-          font-family: 'Share Tech Mono', 'Orbitron', monospace;
-        }
-        thead th {
-          padding: 0.8rem 1.1rem;
-          text-align: left;
-          font-size: 0.95rem;
-          font-weight: 700;
-          background: #dc2626;
-          color: #fff;
-          text-transform: uppercase;
-          border-bottom: 2px solid #fff2;
-          letter-spacing: 1px;
-        }
-        tbody td {
-          padding: 0.8rem 1.1rem;
-          font-size: 1rem;
-          color: #fff;
-          border-top: 1px solid #dc2626;
-          background: rgba(0,0,0,0.6);
-        }
-        tbody tr:hover td {
-          background: #dc2626aa;
-          transition: background 0.2s;
-        }
-        .status-badge {
-          display: inline-block;
-          padding: 0.3rem 0.7rem;
-          font-size: 0.95rem;
-          border-radius: 9999px;
-          font-weight: 700;
-          color: #fff;
-          letter-spacing: 1px;
-          box-shadow: 0 0 8px #dc2626bb;
-          border: 1.2px solid #fff;
-          background: #dc2626;
-        }
-        .status-present { background: #dc2626; }
-        .status-signed-in { background: #a10000; }
-        .status-absent {
-          background: #19191c;
-          color: #dc2626;
-          border: 1.2px solid #dc2626;
-        }
-        .action-link {
-          font-weight: 600;
-          color: #fff;
-          background: #dc2626;
-          border: none;
-          cursor: pointer;
-          padding: 0.3rem 0.8rem;
-          border-radius: 9999px;
-          font-family: 'Orbitron', Arial, sans-serif;
-          font-size: 0.98rem;
-          transition: background 0.15s, color 0.15s;
-          box-shadow: 0 0 10px #dc2626bb;
-        }
-        .action-link:hover {
-          background: #fff;
-          color: #dc2626;
-        }
-        .suggestion-box {
-          background: rgba(220,38,38,0.05);
-          border-radius: 0.8rem;
-          box-shadow: 0 0 8px #dc262650;
-          border: 1px solid #dc2626;
-          padding: 1.2rem 1rem;
-          margin-top: 2rem;
-        }
-        .suggestion-title {
-          font-size: 1.1rem;
-          font-weight: 700;
-          color: #dc2626;
-          margin-bottom: 0.8rem;
-          letter-spacing: 1px;
-        }
-        .suggestion-list {
-          list-style: none;
-          padding: 0;
-          margin-top: 1rem;
-        }
-        .suggestion-item {
-          background: rgba(220,38,38,0.12);
-          padding: 0.7rem 1rem;
-          border-radius: 0.6rem;
-          margin-bottom: 0.7rem;
-          color: #fff;
-          font-size: 1rem;
-          box-shadow: 0 0 8px #dc2626bb;
-          border-left: 3px solid #dc2626;
-        }
-        .suggestion-date {
-          font-size: 0.85rem;
-          color: #dc2626;
-          opacity: 0.7;
-          margin-left: 0.7rem;
-        }
-        @media (max-width: 700px) {
-          .main-card { padding: 1rem; }
-          table, .records-container { font-size: 0.89rem; }
-          .section-title { font-size: 1.1rem; }
-          .app-title { font-size: 1.3rem;}
-        }
-        `}
-      </style>
+      <style>{globalStyles}</style>
+
       <div className="main-card">
-        <div className="text-center">
-          <h1 className="app-title">INtake solutions</h1>
-          <p className="app-subtitle">App ID: {appId}</p>
-        </div>
-        {/* View Switcher */}
-        <div className="view-switcher">
-          <button
-            onClick={() => {
-              setViewMode('employee');
-              setIsPasswordPromptVisible(false);
-              setMessage('');
-            }}
-            className={`tab-button ${viewMode === 'employee' ? 'active' : 'inactive'}`}
-          >
-            Employee View
-          </button>
-          <button
-            onClick={() => setIsPasswordPromptVisible(true)}
-            className={`tab-button ${isPasswordPromptVisible || viewMode === 'employer' ? 'active' : 'inactive'}`}
-          >
-            Employer View
-          </button>
-        </div>
-        {/* Password Prompt */}
-        {isPasswordPromptVisible && viewMode === 'employee' && (
-          <div className="space-y-4 text-center">
-            <h2 className="section-title">Enter Employer Password</h2>
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              <input
-                type="password"
-                placeholder="Password"
-                value={passwordInput}
-                onChange={(e) => setPasswordInput(e.target.value)}
-                onKeyPress={(e) => { if (e.key === 'Enter') handleEmployerLogin(); }}
-                className="input-field flex-1"
+        <Header />
+        <div className="coat-of-arms"></div>
+
+        {popup && (
+          <Popup
+            message={popup.message}
+            type={popup.type}
+            onClose={() => setPopup(null)}
+          />
+        )}
+
+        {/* Login View */}
+        {viewMode === 'login' && (
+          <div>
+            <div className="floating-services">
+              <ServiceCard
+                icon="SVC"
+                title="Citizen Services"
+                description="Book appointments and join service queues"
+                onClick={() => setShowCitizenLogin(true)}
               />
-              <button
-                onClick={handleEmployerLogin}
-                className="action-button sign-in-button"
-              >
-                Go
-              </button>
+              <ServiceCard
+                icon="REG"
+                title="Registration"
+                description="Register new Kenyan citizens (18+ years)"
+                onClick={() => setViewMode('registration')}
+              />
+              <ServiceCard
+                icon="EMP"
+                title="Employee Login"
+                description="Access your booth dashboard and manage daily operations • For staff use only"
+                className="employee-card"
+                onClick={() => promptSecurityKey('employee')}
+              />
+              <ServiceCard
+                icon="ADM"
+                title="Admin Panel"
+                description="System management and oversight • For admin use only"
+                className="admin-card"
+                onClick={() => promptSecurityKey('admin')}
+              />
             </div>
-            {message && (
-              <p className="message-box error-message">{message}</p>
+
+            {showEmployeeLogin && (
+              <SidePanel 
+                isOpen={showEmployeeLogin} 
+                onClose={() => setShowEmployeeLogin(false)} 
+                title="Employee Login"
+              >
+                <EmployeeLogin
+                  loginForm={loginForm}
+                  setLoginForm={setLoginForm}
+                  handleEmployeeLogin={handleEmployeeLogin}
+                />
+              </SidePanel>
+            )}
+
+            {showAdminLogin && (
+              <SidePanel 
+                isOpen={showAdminLogin} 
+                onClose={() => setShowAdminLogin(false)} 
+                title="Admin Login"
+              >
+                <div className="form-group">
+                  <label className="form-label">Password</label>
+                  <input
+                    type="password"
+                    className="input-field"
+                    placeholder="Enter admin password"
+                    value={passwordInput}
+                    onChange={(e) => setPasswordInput(e.target.value)}
+                  />
+                </div>
+                <div className="button-group">
+                  <button className="action-button" onClick={handleAdminLogin}>Login</button>
+                  <button className="action-button secondary-button" onClick={() => setShowAdminLogin(false)}>Cancel</button>
+                </div>
+              </SidePanel>
+            )}
+
+            {showSecurityPrompt && (
+              <SidePanel 
+                isOpen={showSecurityPrompt} 
+                onClose={() => {
+                  setShowSecurityPrompt(false);
+                  setSecurityKey('');
+                  setPendingAction(null);
+                }} 
+                title="Security Access"
+              >
+                <div className="form-group">
+                  <label className="form-label">Security Key</label>
+                  <input
+                    type="password"
+                    className="input-field"
+                    placeholder="Enter security key"
+                    value={securityKey}
+                    onChange={(e) => setSecurityKey(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSecurityKeySubmit()}
+                  />
+                </div>
+                <div className="button-group">
+                  <button className="action-button" onClick={handleSecurityKeySubmit}>Access</button>
+                  <button className="action-button secondary-button" onClick={() => {
+                    setShowSecurityPrompt(false);
+                    setSecurityKey('');
+                    setPendingAction(null);
+                  }}>Cancel</button>
+                </div>
+              </SidePanel>
+            )}
+
+            {showCitizenLogin && (
+              <SidePanel 
+                isOpen={showCitizenLogin} 
+                onClose={() => setShowCitizenLogin(false)} 
+                title="Citizen Login"
+              >
+                <CitizenLogin
+                  citizenLoginForm={citizenLoginForm}
+                  setCitizenLoginForm={setCitizenLoginForm}
+                  handleCitizenLogin={handleCitizenLogin}
+                />
+              </SidePanel>
             )}
           </div>
         )}
-        {/* Employee View */}
-        {viewMode === 'employee' && !isPasswordPromptVisible && (
-          <div className="space-y-6">
-            <h2 className="section-title">Employee Sign In / Out</h2>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}>
-              <input
-                type="text"
-                placeholder="Enter Employee ID"
-                value={employeeIdInput}
-                onChange={(e) => setEmployeeIdInput(e.target.value)}
-                className="input-field"
-                style={{ flex: 1, minWidth: '140px' }}
-              />
-              <input
-                type="text"
-                placeholder="Enter Employee Name"
-                value={employeeNameInput}
-                onChange={(e) => setEmployeeNameInput(e.target.value)}
-                className="input-field"
-                style={{ flex: 2, minWidth: '140px' }}
-              />
-              <button
-                onClick={handleSignIn}
-                className="action-button sign-in-button"
-              >
-                Sign In
-              </button>
-              <button
-                onClick={handleSignOut}
-                className="action-button sign-out-button"
-              >
-                Sign Out
-              </button>
-            </div>
-            {message && (
-              <p className="message-box">{message}</p>
-            )}
-            {/* Suggestion Box */}
-            <div className="suggestion-box">
-              <div className="suggestion-title">Suggestion Box</div>
-              <input
-                type="text"
-                placeholder="Enter your suggestion here..."
-                value={suggestionInput}
-                onChange={(e) => setSuggestionInput(e.target.value)}
-                className="input-field"
-                style={{ width: '80%', marginBottom: '0.8rem' }}
-                maxLength={150}
-              />
-              <button
-                className="action-button sign-in-button"
-                onClick={handleSuggestionSubmit}
-              >
-                Submit Suggestion
-              </button>
-            </div>
-          </div>
+
+        {/* Employee Dashboard */}
+        {viewMode === 'employee-dashboard' && currentUser && (
+          <EmployeeDashboard
+            currentUser={currentUser}
+            appointments={appointments}
+            serviceRecords={serviceRecords}
+            showChat={showChat}
+            setShowChat={setShowChat}
+            chats={chats}
+            newMessage={newMessage}
+            setNewMessage={setNewMessage}
+            sendMessage={sendMessage}
+            markAppointmentDone={markAppointmentDone}
+            updateAppointmentNotes={updateAppointmentNotes}
+            logout={logout}
+            getFormattedDate={getFormattedDate}
+            onBackToServices={() => setViewMode('login')}
+            citizenDatabase={citizenDatabase}
+            biometricSearch={biometricSearch}
+            setBiometricSearch={setBiometricSearch}
+            biometricResults={biometricResults}
+            searchBiometric={searchBiometric}
+            showBiometricSearch={showBiometricSearch}
+            setShowBiometricSearch={setShowBiometricSearch}
+          />
         )}
-        {/* Employer View */}
-        {viewMode === 'employer' && (
-          <div className="space-y-6">
-            <h2 className="section-title">Attendance Records</h2>
-            <p className="app-subtitle">
-              VIEW ONLY: Employer mode is read-only. Employees must sign in/out themselves.
-            </p>
-            {/* Print Button */}
-            <div style={{ textAlign: "right", marginBottom: "1rem" }}>
-              <button
-                className="action-button sign-in-button"
-                onClick={handlePrintRecords}
-                style={{ maxWidth: "200px" }}
+
+        {/* Citizen Services */}
+        {viewMode === 'citizen' && currentCitizen && (
+          <div>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '1.5rem'
+            }}>
+              <button 
+                onClick={() => { setViewMode('login'); setCurrentCitizen(null); }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'rgba(34, 139, 34, 0.2)',
+                  border: '1px solid rgba(34, 139, 34, 0.4)',
+                  borderRadius: '8px',
+                  padding: '8px 12px',
+                  color: '#ffffff',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  transition: 'all 0.3s ease'
+                }}
               >
-                Print Records
+                <span style={{fontSize: '16px'}}>←</span>
+                Back to Services
               </button>
-            </div>
-            <div className="records-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Employee ID</th>
-                    <th>Employee Name</th>
-                    <th>Date</th>
-                    <th>Time In</th>
-                    <th>Time Out</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {attendanceRecords.map((record, index) => (
-                    <tr key={index}>
-                      <td>{record.employeeId}</td>
-                      <td>{record.employeeName || '—'}</td>
-                      <td>{record.date}</td>
-                      <td>{record.signInTime || '—'}</td>
-                      <td>{record.signOutTime || '—'}</td>
-                      <td>
-                        <span className={`status-badge ${record.status === 'present' ? 'status-present' :
-                          record.status === 'signed-in' ? 'status-signed-in' :
-                            'status-absent'
-                          }`}>
-                          {record.status}
-                        </span>
-                      </td>
-                      <td>
-                        <button
-                          onClick={() => handleMarkAbsent(record.employeeId, record.date)}
-                          className="action-link"
-                        >
-                          Mark Absent
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  {attendanceRecords.length === 0 && (
-                    <tr>
-                      <td colSpan="7" style={{ textAlign: 'center' }}>
-                        No attendance records found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-            {/* Suggestion List for Employer */}
-            <div className="suggestion-box">
-              <div className="suggestion-title">Employee Suggestions</div>
-              <ul className="suggestion-list">
-                {suggestions.length === 0 && (
-                  <li style={{ color: '#dc2626', opacity: 0.7, fontStyle: 'italic' }}>No suggestions yet.</li>
+              
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button 
+                  onClick={() => setShowDigitalID(true)}
+                  style={{
+                    background: 'linear-gradient(135deg, #dc2626 0%, #228b22 100%)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '8px 16px',
+                    color: '#ffffff',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    fontWeight: '500',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  My Digital ID
+                </button>
+                
+                {(currentCitizen.status === 'expired' || currentCitizen.status === 'expires_soon') && (
+                  <button 
+                    onClick={() => {
+                      setCitizenForm({ 
+                        ...citizenForm, 
+                        name: `${currentCitizen.firstName} ${currentCitizen.lastName}`,
+                        phoneNumber: currentCitizen.phoneNumber,
+                        idNumber: currentCitizen.idNumber,
+                        serviceType: 'replacement'
+                      });
+                    }}
+                    style={{
+                      background: '#f59e0b',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '8px 16px',
+                      color: '#ffffff',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      fontWeight: '500',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    Renew ID
+                  </button>
                 )}
-                {suggestions.map((sugg, idx) => (
-                  <li key={idx} className="suggestion-item">
-                    {sugg.text}
-                    <span className="suggestion-date">&mdash; {sugg.date}, {sugg.time}</span>
-                  </li>
-                ))}
-              </ul>
+              </div>
             </div>
+
+            <CitizenServices
+              citizenForm={citizenForm}
+              setCitizenForm={setCitizenForm}
+              bookAppointment={bookAppointment}
+              currentCitizen={currentCitizen}
+              showDigitalID={showDigitalID}
+              setShowDigitalID={setShowDigitalID}
+              documentProduction={documentProduction}
+              lostReports={lostReports}
+              setLostReports={setLostReports}
+              showPopup={showPopup}
+            />
           </div>
+        )}
+
+        {/* Registration Portal */}
+        {viewMode === 'registration' && (
+          <div>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'flex-start',
+              marginBottom: '1.5rem'
+            }}>
+              <button 
+                onClick={() => setViewMode('login')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'rgba(34, 139, 34, 0.2)',
+                  border: '1px solid rgba(34, 139, 34, 0.4)',
+                  borderRadius: '8px',
+                  padding: '8px 12px',
+                  color: '#ffffff',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <span style={{fontSize: '16px'}}>←</span>
+                Back to Services
+              </button>
+            </div>
+
+            <RegistrationForm
+              registrationForm={registrationForm}
+              setRegistrationForm={setRegistrationForm}
+              registerCitizen={registerCitizen}
+              citizenDatabase={citizenDatabase}
+              setCitizenDatabase={setCitizenDatabase}
+              showPopup={showPopup}
+            />
+          </div>
+        )}
+
+        {/* Admin Dashboard */}
+        {viewMode === 'admin' && (
+          <AdminDashboard
+            booths={booths}
+            employees={employees}
+            citizenQueue={citizenQueue}
+            serviceRecords={serviceRecords}
+            activeBooths={activeBooths}
+            currentServing={currentServing}
+            newBooth={newBooth}
+            setNewBooth={setNewBooth}
+            addBooth={addBooth}
+            newEmployee={newEmployee}
+            setNewEmployee={setNewEmployee}
+            addEmployee={addEmployee}
+            showChat={showChat}
+            setShowChat={setShowChat}
+            chats={chats}
+            replyToMessage={replyToMessage}
+            logout={logout}
+            getFormattedDate={getFormattedDate}
+            onBackToServices={logout}
+            citizenDatabase={citizenDatabase}
+            biometricSearch={biometricSearch}
+            setBiometricSearch={setBiometricSearch}
+            biometricResults={biometricResults}
+            searchBiometric={searchBiometric}
+            showBiometricSearch={showBiometricSearch}
+            setShowBiometricSearch={setShowBiometricSearch}
+          />
         )}
       </div>
     </div>
