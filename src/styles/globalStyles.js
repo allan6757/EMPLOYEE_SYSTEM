@@ -25,12 +25,12 @@ export const globalStyles = `
   --bg-secondary: rgba(255, 255, 255, 0.98);
   --bg-card: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 50%, rgba(255, 255, 255, 0.95) 100%);
   --bg-section: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 50%, rgba(255, 255, 255, 0.95) 100%);
-  --bg-input: rgba(255, 255, 255, 0.95);
-  --text-primary: #111827;
-  --text-secondary: #374151;
-  --text-muted: #6b7280;
-  --border-primary: rgba(220, 38, 38, 0.4);
-  --border-secondary: rgba(209, 213, 219, 0.6);
+  --bg-input: rgba(255, 255, 255, 0.98);
+  --text-primary: #0f172a;
+  --text-secondary: #1e293b;
+  --text-muted: #475569;
+  --border-primary: rgba(220, 38, 38, 0.5);
+  --border-secondary: rgba(148, 163, 184, 0.8);
   --accent-red: #dc2626;
   --accent-green: #16a34a;
   --shadow-primary: rgba(0, 0, 0, 0.15);
@@ -301,7 +301,7 @@ body::before, .app-container::before {
 .input-field, select {
   padding: 0.875rem 1rem;
   border-radius: 12px;
-  border: 1px solid var(--border-secondary);
+  border: 2px solid var(--border-secondary);
   background: var(--bg-input);
   color: var(--text-primary);
   font-size: 0.95rem;
@@ -311,6 +311,7 @@ body::before, .app-container::before {
   transition: all 0.3s ease;
   font-family: inherit;
   display: block;
+  box-shadow: 0 2px 4px var(--shadow-secondary);
 }
 
 .input-field:focus, select:focus {
@@ -390,7 +391,7 @@ body::before, .app-container::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 16px;
   z-index: 1;
 }
@@ -428,9 +429,9 @@ body::before, .app-container::before {
 }
 
 .form-label {
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .button-group {
