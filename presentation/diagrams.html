@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Diagrams - Nairobi Registration Bureau</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); 
+            color: white; 
+            min-height: 100vh;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { font-size: 2.5rem; color: #dc2626; margin-bottom: 10px; }
+        .header p { font-size: 1.2rem; opacity: 0.8; }
+        
+        .diagram-section { 
+            margin-bottom: 60px; 
+            background: rgba(255,255,255,0.05); 
+            border-radius: 15px; 
+            padding: 30px; 
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .diagram-section h2 { 
+            font-size: 2rem; 
+            color: #fbbf24; 
+            margin-bottom: 20px; 
+            text-align: center;
+        }
+        .diagram-section h3 { 
+            font-size: 1.5rem; 
+            color: #10b981; 
+            margin-bottom: 15px; 
+        }
+        
+        .mermaid { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            margin: 20px 0; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: auto;
+        }
+        
+        .diagram-controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+        }
+        .btn.active {
+            background: #10b981;
+        }
+        
+        .description {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #dc2626;
+        }
+        
+        .features-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .feature-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ Nairobi Registration Bureau</h1>
+            <p>System Architecture Diagrams</p>
+        </div>
+
+        <!-- ERD Section -->
+        <div class="diagram-section">
+            <h2>📊 Entity Relationship Diagram (ERD)</h2>
+            <div class="description">
+                <p>The ERD shows the database structure and relationships between different entities in the system. It illustrates how users, citizens, employees, booths, appointments, documents, and service records are interconnected.</p>
+            </div>
+            
+            <div class="mermaid">
+erDiagram
+    USER ||--o{ CITIZEN : "can_be"
+    USER ||--o{ EMPLOYEE : "can_be"
+    
+    USER {
+        string id PK
+        string email UK
+        string password
+        string firstName
+        string lastName
+        string phoneNumber
+        datetime createdAt
+        string status
+    }
+    
+    CITIZEN {
+        string id PK
+        string idNumber UK
+        string firstName
+        string lastName
+        date dateOfBirth
+        string placeOfBirth
+        string nationality
+        string gender
+        string phoneNumber
+        string email
+        string address
+        date registrationDate
+        date issueDate
+        date expiryDate
+        string status
+        string documentStatus
+        string biometricKey UK
+    }
+    
+    EMPLOYEE {
+        string id PK
+        string employeeId UK
+        string name
+        string password
+        string boothId FK
+        string role
+        string status
+    }
+    
+    BOOTH {
+        string id PK
+        string boothId UK
+        string name
+        string serviceType
+        string status
+    }
+    
+    APPOINTMENT {
+        string id PK
+        string citizenId FK
+        string boothId FK
+        string serviceType
+        datetime appointmentDate
+        string status
+        string queueNumber
+    }
+    
+    DOCUMENT {
+        string id PK
+        string citizenId FK
+        string idNumber
+        string citizenName
+        string documentType
+        string productionStage
+        date orderDate
+        date expectedCompletion
+        string status
+    }
+    
+    SERVICE_RECORD {
+        string id PK
+        string citizenId FK
+        string employeeId FK
+        string boothId FK
+        string serviceType
+        datetime serviceDate
+        string status
+    }
+    
+    LOST_REPORT {
+        string id PK
+        string citizenId FK
+        string idNumber
+        string reportType
+        string description
+        date reportDate
+        string status
+    }
+    
+    CITIZEN ||--o{ APPOINTMENT : "books"
+    CITIZEN ||--o{ DOCUMENT : "owns"
+    CITIZEN ||--o{ SERVICE_RECORD : "receives"
+    CITIZEN ||--o{ LOST_REPORT : "files"
+    EMPLOYEE ||--|| BOOTH : "operates"
+    EMPLOYEE ||--o{ SERVICE_RECORD : "provides"
+    BOOTH ||--o{ APPOINTMENT : "hosts"
+    BOOTH ||--o{ SERVICE_RECORD : "location"
+            </div>
+            
+            <div class="features-list">
+                <div class="feature-item">
+                    <h4>🔑 Key Entities</h4>
+                    <ul>
+                        <li>USER - Base authentication</li>
+                        <li>CITIZEN - Service recipients</li>
+                        <li>EMPLOYEE - Service providers</li>
+                        <li>BOOTH - Service locations</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h4>📋 Service Entities</h4>
+                    <ul>
+                        <li>APPOINTMENT - Scheduled services</li>
+                        <li>DOCUMENT - ID production tracking</li>
+                        <li>SERVICE_RECORD - Transaction history</li>
+                        <li>LOST_REPORT - Lost ID reports</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- DFD Context Section -->
+        <div class="diagram-section">
+            <h2>🔄 Data Flow Diagram - Context Level</h2>
+            <div class="description">
+                <p>The context diagram shows the system boundaries and how external entities (Citizens, Employees, Admin) interact with the Registration Bureau System.</p>
+            </div>
+            
+            <div class="mermaid">
+flowchart TD
+    C["👥 Citizens"] --> S["🏛️ Registration Bureau System"]
+    E["👨‍💼 Employees"] --> S
+    A["👨‍💻 Admin"] --> S
+    S --> C
+    S --> E
+    S --> A
+    S --> DB[("🗄️ Database")]
+    S --> EXT["🌐 External Services"]
+    
+    style C fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    style E fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    style A fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style S fill:#e8f5e8,stroke:#1b5e20,stroke-width:3px
+    style DB fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    style EXT fill:#f1f8e9,stroke:#33691e,stroke-width:2px
+            </div>
+        </div>
+
+        <!-- DFD Level 1 Section -->
+        <div class="diagram-section">
+            <h2>🔄 Data Flow Diagram - System Overview</h2>
+            <div class="description">
+                <p>This level 1 DFD breaks down the system into core processes and shows how data flows between external entities, processes, and data stores.</p>
+            </div>
+            
+            <div class="mermaid">
+flowchart TD
+    subgraph "External Entities"
+        C["👥 Citizens"]
+        E["👨‍💼 Employees"]
+        A["👨‍💻 Admin"]
+    end
+    
+    subgraph "Core Processes"
+        P1["🔐 Authentication<br/>Process"]
+        P2["📋 Service Request<br/>Process"]
+        P3["📄 Document Tracking<br/>Process"]
+        P4["👨‍💼 Employee Login<br/>Process"]
+        P5["⚙️ Service<br/>Processing"]
+        P6["📊 Queue<br/>Management"]
+        P7["🛠️ Admin<br/>Management"]
+        P8["📈 System<br/>Monitoring"]
+    end
+    
+    subgraph "Data Stores"
+        D1[("👤 User<br/>Database")]
+        D2[("📋 Service<br/>Records")]
+        D3[("📄 Document<br/>Database")]
+        D4[("👨‍💼 Employee<br/>Database")]
+        D5[("📊 Queue<br/>Database")]
+    end
+    
+    C --> P1
+    C --> P2
+    C --> P3
+    E --> P4
+    E --> P5
+    E --> P6
+    A --> P7
+    A --> P8
+    
+    P1 --> D1
+    P2 --> D2
+    P3 --> D3
+    P4 --> D4
+    P5 --> D2
+    P6 --> D5
+    P7 --> D1
+    P7 --> D4
+    P8 --> D2
+    P8 --> D5
+    
+    style C fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    style E fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    style A fill:#fff3e0,stroke:#e65100,stroke-width:2px
+            </div>
+            
+            <div class="features-list">
+                <div class="feature-item">
+                    <h4>🔄 Core Processes</h4>
+                    <ul>
+                        <li>Authentication & Authorization</li>
+                        <li>Service Request Handling</li>
+                        <li>Document Production Tracking</li>
+                        <li>Queue Management</li>
+                    </ul>
+                </div>
+                <div class="feature-item">
+                    <h4>🗄️ Data Stores</h4>
+                    <ul>
+                        <li>User Database - Authentication data</li>
+                        <li>Service Records - Transaction history</li>
+                        <li>Document Database - ID production</li>
+                        <li>Queue Database - Real-time queues</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Process Flow -->
+        <div class="diagram-section">
+            <h2>🔄 Detailed Process Flow</h2>
+            <div class="description">
+                <p>This detailed flowchart shows the specific steps and decision points in the citizen service process.</p>
+            </div>
+            
+            <div class="mermaid">
+flowchart TD
+    Start([👤 Citizen Arrives]) --> Login{🔐 Login Required?}
+    Login -->|Yes| Auth[🔑 Authentication]
+    Login -->|No| Service[📋 Select Service]
+    Auth --> Service
+    
+    Service --> NewID{🆕 New ID?}
+    Service --> Replace{🔄 Replacement?}
+    Service --> Correct{✏️ Correction?}
+    Service --> Track{📄 Track Document?}
+    
+    NewID -->|Yes| Register[📝 Registration Form]
+    Replace -->|Yes| Verify[🔍 Identity Verification]
+    Correct -->|Yes| Verify
+    Track -->|Yes| Status[📊 Show Status]
+    
+    Register --> Biometric[👆 Biometric Capture]
+    Verify --> Biometric
+    
+    Biometric --> Queue[📋 Join Queue]
+    Queue --> Booth[🏢 Assigned to Booth]
+    Booth --> Employee[👨‍💼 Employee Processing]
+    
+    Employee --> Complete{✅ Service Complete?}
+    Complete -->|Yes| Receipt[🧾 Generate Receipt]
+    Complete -->|No| Additional[➕ Additional Info Needed]
+    
+    Additional --> Employee
+    Receipt --> End([✅ Service Complete])
+    Status --> End
+    
+    style Start fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    style End fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    style Login fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style Complete fill:#fff3e0,stroke:#e65100,stroke-width:2px
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Mermaid with enhanced configuration
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#dc2626',
+                primaryTextColor: '#1f2937',
+                primaryBorderColor: '#dc2626',
+                lineColor: '#374151',
+                sectionBkgColor: '#f9fafb',
+                altSectionBkgColor: '#ffffff',
+                gridColor: '#e5e7eb',
+                secondaryColor: '#fbbf24',
+                tertiaryColor: '#10b981',
+                background: '#ffffff',
+                mainBkg: '#ffffff',
+                secondBkg: '#f8fafc',
+                tertiaryBkg: '#f1f5f9'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            er: {
+                useMaxWidth: true,
+                fontSize: 12
+            },
+            sequence: {
+                useMaxWidth: true
+            }
+        });
+
+        // Smooth scrolling for navigation
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        // Add loading animation
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.querySelectorAll('.mermaid').forEach(element => {
+                    element.style.opacity = '0';
+                    element.style.transform = 'translateY(20px)';
+                    element.style.transition = 'all 0.5s ease';
+                    
+                    setTimeout(() => {
+                        element.style.opacity = '1';
+                        element.style.transform = 'translateY(0)';
+                    }, 100);
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>

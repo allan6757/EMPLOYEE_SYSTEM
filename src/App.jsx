@@ -14,6 +14,8 @@ import SignupForm from './components/Auth/SignupForm';
 import ErrorBoundary from './components/Layout/ErrorBoundary';
 import LoadingSpinner from './components/Layout/LoadingSpinner';
 import { useLocalStorage } from './hooks/useLocalStorage';
+import { useTheme } from './hooks/useTheme';
+import ThemeToggle from './components/Layout/ThemeToggle';
 import { 
   getFormattedDate, 
   getFormattedTime, 
@@ -34,6 +36,7 @@ const App = () => {
   const [lastActivity, setLastActivity] = useState(Date.now());
   const [showSignup, setShowSignup] = useState(false);
   const [userAccounts, setUserAccounts] = useLocalStorage(`userAccounts_${appId}`, []);
+  const { theme, toggleTheme } = useTheme();
 
   // Authentication & User State
   const [currentUser, setCurrentUser] = useState(null);
@@ -749,6 +752,7 @@ const App = () => {
     <ErrorBoundary>
       <div className="app-container">
         <style>{globalStyles}</style>
+        <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
 
         <div className="main-card">
         <Header />
@@ -1030,8 +1034,6 @@ const App = () => {
               registrationForm={registrationForm}
               setRegistrationForm={setRegistrationForm}
               registerCitizen={registerCitizen}
-              citizenDatabase={citizenDatabase}
-              setCitizenDatabase={setCitizenDatabase}
               showPopup={showPopup}
             />
           </div>

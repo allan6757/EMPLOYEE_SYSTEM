@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nairobi Registration Bureau - System Presentation</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a1a; color: white; }
+        .presentation { width: 100vw; height: 100vh; overflow: hidden; }
+        .slide { width: 100%; height: 100%; display: none; padding: 40px; position: relative; }
+        .slide.active { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .slide h1 { font-size: 3rem; margin-bottom: 30px; color: #dc2626; text-align: center; }
+        .slide h2 { font-size: 2rem; margin-bottom: 20px; color: #fbbf24; }
+        .slide h3 { font-size: 1.5rem; margin-bottom: 15px; color: #10b981; }
+        .slide p, .slide li { font-size: 1.2rem; line-height: 1.6; margin-bottom: 10px; }
+        .slide ul { margin-left: 30px; }
+        .mermaid { background: white; padding: 20px; border-radius: 10px; margin: 20px 0; max-width: 95%; max-height: 70vh; overflow: auto; }
+        .diagram-container { width: 100%; display: flex; justify-content: center; align-items: center; }
+        .controls { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
+        .btn { background: #dc2626; color: white; border: none; padding: 10px 20px; margin: 5px; border-radius: 5px; cursor: pointer; }
+        .btn:hover { background: #b91c1c; }
+        .slide-counter { position: fixed; bottom: 20px; left: 20px; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 5px; }
+        .features-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; width: 100%; max-width: 1200px; }
+        .feature-card { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #dc2626; }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <h1>Nairobi Registration Bureau</h1>
+            <h2>Employee & Citizen Management System</h2>
+            <p style="font-size: 1.5rem; margin-top: 40px; text-align: center;">Digital Identity Management Solution</p>
+            <p style="margin-top: 20px; opacity: 0.8;">Built with React & Modern Web Technologies</p>
+        </div>
+
+        <!-- Slide 2: System Overview -->
+        <div class="slide">
+            <h1>System Overview</h1>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>🏛️ Multi-Portal System</h3>
+                    <ul>
+                        <li>Citizen Services Portal</li>
+                        <li>Employee Dashboard</li>
+                        <li>Admin Panel</li>
+                        <li>Registration Portal</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>🔐 Security Features</h3>
+                    <ul>
+                        <li>Multi-level authentication</li>
+                        <li>Biometric key generation</li>
+                        <li>Fraud detection</li>
+                        <li>Digital ID with security features</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>📱 Digital Services</h3>
+                    <ul>
+                        <li>Digital ID with QR codes</li>
+                        <li>Document tracking</li>
+                        <li>Lost ID reporting</li>
+                        <li>Appointment booking</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h3>🛠️ Technology Stack</h3>
+                    <ul>
+                        <li>React 19.1.1</li>
+                        <li>Vite 7.1.2</li>
+                        <li>Modern CSS-in-JS</li>
+                        <li>Local Storage</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: ERD -->
+        <div class="slide">
+            <h1>Entity Relationship Diagram</h1>
+            <div class="diagram-container">
+                <div class="mermaid" id="erd-diagram">
+erDiagram
+    USER ||--o{ CITIZEN : "can_be"
+    USER ||--o{ EMPLOYEE : "can_be"
+    
+    USER {
+        string id PK
+        string email UK
+        string password
+        string firstName
+        string lastName
+        string phoneNumber
+        datetime createdAt
+        string status
+    }
+    
+    CITIZEN {
+        string id PK
+        string idNumber UK
+        string firstName
+        string lastName
+        date dateOfBirth
+        string placeOfBirth
+        string nationality
+        string gender
+        string phoneNumber
+        string email
+        string address
+        date registrationDate
+        date issueDate
+        date expiryDate
+        string status
+        string documentStatus
+        string biometricKey UK
+    }
+    
+    EMPLOYEE {
+        string id PK
+        string employeeId UK
+        string name
+        string password
+        string boothId FK
+        string role
+        string status
+    }
+    
+    BOOTH {
+        string id PK
+        string boothId UK
+        string name
+        string serviceType
+        string status
+    }
+    
+    APPOINTMENT {
+        string id PK
+        string citizenId FK
+        string boothId FK
+        string serviceType
+        datetime appointmentDate
+        string status
+        string queueNumber
+    }
+    
+    DOCUMENT {
+        string id PK
+        string citizenId FK
+        string idNumber
+        string citizenName
+        string documentType
+        string productionStage
+        date orderDate
+        date expectedCompletion
+        string status
+    }
+    
+    SERVICE_RECORD {
+        string id PK
+        string citizenId FK
+        string employeeId FK
+        string boothId FK
+        string serviceType
+        datetime serviceDate
+        string status
+    }
+    
+    CITIZEN ||--o{ APPOINTMENT : "books"
+    CITIZEN ||--o{ DOCUMENT : "owns"
+    CITIZEN ||--o{ SERVICE_RECORD : "receives"
+    EMPLOYEE ||--|| BOOTH : "operates"
+    EMPLOYEE ||--o{ SERVICE_RECORD : "provides"
+    BOOTH ||--o{ APPOINTMENT : "hosts"
+    BOOTH ||--o{ SERVICE_RECORD : "location"
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: DFD Level 0 -->
+        <div class="slide">
+            <h1>Data Flow Diagram - Context Level</h1>
+            <div class="diagram-container">
+                <div class="mermaid" id="dfd-context">
+flowchart TD
+    C["👥 Citizens"] --> S["🏛️ Registration Bureau System"]
+    E["👨‍💼 Employees"] --> S
+    A["👨‍💻 Admin"] --> S
+    S --> C
+    S --> E
+    S --> A
+    S --> DB[("🗄️ Database")]
+    S --> EXT["🌐 External Services"]
+    
+    style C fill:#e1f5fe
+    style E fill:#f3e5f5
+    style A fill:#fff3e0
+    style S fill:#e8f5e8
+    style DB fill:#fce4ec
+    style EXT fill:#f1f8e9
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 5: DFD Level 1 -->
+        <div class="slide">
+            <h1>Data Flow Diagram - System Overview</h1>
+            <div class="diagram-container">
+                <div class="mermaid" id="dfd-level1">
+flowchart TD
+    subgraph "External Entities"
+        C["👥 Citizens"]
+        E["👨‍💼 Employees"]
+        A["👨‍💻 Admin"]
+    end
+    
+    subgraph "Core Processes"
+        P1["🔐 Authentication\nProcess"]
+        P2["📋 Service Request\nProcess"]
+        P3["📄 Document Tracking\nProcess"]
+        P4["👨‍💼 Employee Login\nProcess"]
+        P5["⚙️ Service\nProcessing"]
+        P6["📊 Queue\nManagement"]
+        P7["🛠️ Admin\nManagement"]
+        P8["📈 System\nMonitoring"]
+    end
+    
+    subgraph "Data Stores"
+        D1[("👤 User\nDatabase")]
+        D2[("📋 Service\nRecords")]
+        D3[("📄 Document\nDatabase")]
+        D4[("👨‍💼 Employee\nDatabase")]
+        D5[("📊 Queue\nDatabase")]
+    end
+    
+    C --> P1
+    C --> P2
+    C --> P3
+    E --> P4
+    E --> P5
+    E --> P6
+    A --> P7
+    A --> P8
+    
+    P1 --> D1
+    P2 --> D2
+    P3 --> D3
+    P4 --> D4
+    P5 --> D2
+    P6 --> D5
+    P7 --> D1
+    P7 --> D4
+    P8 --> D2
+    P8 --> D5
+    
+    style C fill:#e1f5fe
+    style E fill:#f3e5f5
+    style A fill:#fff3e0
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Key Features -->
+        <div class="slide">
+            <h1>Key Features</h1>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; width: 100%; max-width: 1200px;">
+                <div>
+                    <h2>Citizen Services</h2>
+                    <ul>
+                        <li>Digital ID Display</li>
+                        <li>Appointment Booking</li>
+                        <li>Document Status Tracking</li>
+                        <li>Lost ID Reporting</li>
+                        <li>QR Code Generation</li>
+                    </ul>
+                </div>
+                <div>
+                    <h2>Employee Operations</h2>
+                    <ul>
+                        <li>Booth Management</li>
+                        <li>Queue Processing</li>
+                        <li>Citizen Verification</li>
+                        <li>Service Records</li>
+                        <li>Real-time Chat</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Thank You -->
+        <div class="slide">
+            <h1>Thank You</h1>
+            <h2>Questions & Discussion</h2>
+            <p style="font-size: 1.5rem; margin-top: 40px; text-align: center;">Nairobi Registration Bureau</p>
+            <p style="margin-top: 20px; opacity: 0.8;">Digital Identity Management System</p>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" onclick="previousSlide()">← Previous</button>
+        <button class="btn" onclick="nextSlide()">Next →</button>
+    </div>
+
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">7</span>
+    </div>
+
+    <script>
+        // Initialize Mermaid with better configuration
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#dc2626',
+                primaryTextColor: '#1f2937',
+                primaryBorderColor: '#dc2626',
+                lineColor: '#374151',
+                sectionBkgColor: '#f9fafb',
+                altSectionBkgColor: '#ffffff',
+                gridColor: '#e5e7eb',
+                secondaryColor: '#fbbf24',
+                tertiaryColor: '#10b981'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true
+            },
+            er: {
+                useMaxWidth: true
+            }
+        });
+        
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('total-slides').textContent = totalSlides;
+        
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+            
+            // Re-render mermaid diagrams when slide changes
+            setTimeout(() => {
+                const mermaidElements = slides[currentSlide].querySelectorAll('.mermaid');
+                mermaidElements.forEach(element => {
+                    if (element.getAttribute('data-processed') !== 'true') {
+                        mermaid.init(undefined, element);
+                    }
+                });
+            }, 100);
+        }
+        
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function previousSlide() { showSlide(currentSlide - 1); }
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+        });
+        
+        // Ensure diagrams render on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                mermaid.init();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

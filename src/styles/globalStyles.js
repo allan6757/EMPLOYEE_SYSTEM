@@ -1,22 +1,59 @@
 export const globalStyles = `
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
 
+:root {
+  /* Dark theme variables */
+  --bg-primary: linear-gradient(135deg, #000000 0%, #1a0000 25%, #000000 50%, #001a00 75%, #000000 100%);
+  --bg-secondary: rgba(0, 0, 0, 0.95);
+  --bg-card: linear-gradient(135deg, rgba(15, 15, 15, 0.9) 0%, rgba(25, 5, 5, 0.8) 50%, rgba(15, 15, 15, 0.9) 100%);
+  --bg-section: linear-gradient(135deg, rgba(31, 31, 31, 0.9) 0%, rgba(15, 5, 5, 0.8) 50%, rgba(31, 31, 31, 0.9) 100%);
+  --bg-input: rgba(31, 31, 31, 0.8);
+  --text-primary: #ffffff;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --border-primary: rgba(220, 38, 38, 0.3);
+  --border-secondary: rgba(55, 55, 55, 0.3);
+  --accent-red: #dc2626;
+  --accent-green: #228b22;
+  --shadow-primary: rgba(0, 0, 0, 0.9);
+  --shadow-secondary: rgba(0, 0, 0, 0.7);
+}
+
+[data-theme="light"] {
+  /* Light theme variables */
+  --bg-primary: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 25%, #f1f5f9 50%, #e8f5e8 75%, #f8fafc 100%);
+  --bg-secondary: rgba(255, 255, 255, 0.95);
+  --bg-card: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 50%, rgba(255, 255, 255, 0.9) 100%);
+  --bg-section: linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(241, 245, 249, 0.8) 50%, rgba(248, 250, 252, 0.9) 100%);
+  --bg-input: rgba(255, 255, 255, 0.9);
+  --text-primary: #1f2937;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  --border-primary: rgba(220, 38, 38, 0.3);
+  --border-secondary: rgba(209, 213, 219, 0.5);
+  --accent-red: #dc2626;
+  --accent-green: #16a34a;
+  --shadow-primary: rgba(0, 0, 0, 0.1);
+  --shadow-secondary: rgba(0, 0, 0, 0.05);
+}
+
 * {
   box-sizing: border-box;
 }
 
 body, .app-container {
-  background: linear-gradient(135deg, #000000 0%, #1a0000 25%, #000000 50%, #001a00 75%, #000000 100%),
+  background: var(--bg-primary),
              radial-gradient(circle at 20% 20%, rgba(220, 38, 38, 0.1) 0%, transparent 50%),
              radial-gradient(circle at 80% 80%, rgba(34, 139, 34, 0.1) 0%, transparent 50%);
   min-height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  color: #ffffff;
+  color: var(--text-primary);
   margin: 0;
   padding: 0;
   line-height: 1.6;
   overflow-x: hidden;
   position: relative;
+  transition: all 0.3s ease;
 }
 
 body::before, .app-container::before {
@@ -51,19 +88,20 @@ body::before, .app-container::before {
 }
 
 .main-card {
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 0, 0, 0.9) 25%, rgba(0, 0, 0, 0.95) 50%, rgba(0, 10, 0, 0.9) 75%, rgba(0, 0, 0, 0.95) 100%);
+  background: var(--bg-secondary);
   backdrop-filter: blur(30px);
   border-radius: 32px;
   box-shadow: 
-    0 32px 64px -12px rgba(0, 0, 0, 0.9),
-    0 0 0 1px rgba(220, 38, 38, 0.3),
+    0 32px 64px -12px var(--shadow-primary),
+    0 0 0 1px var(--border-primary),
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
     0 0 50px rgba(220, 38, 38, 0.1);
   padding: 3rem;
   max-width: 1600px;
   margin: 2rem auto;
-  border: 2px solid rgba(220, 38, 38, 0.4);
+  border: 2px solid var(--border-primary);
   position: relative;
+  transition: all 0.3s ease;
 }
 
 .main-card::before {
@@ -168,18 +206,18 @@ body::before, .app-container::before {
 }
 
 .service-card {
-  background: linear-gradient(135deg, rgba(15, 15, 15, 0.9) 0%, rgba(25, 5, 5, 0.8) 50%, rgba(15, 15, 15, 0.9) 100%);
+  background: var(--bg-card);
   backdrop-filter: blur(20px);
   border-radius: 24px;
   padding: 2rem;
-  border: 2px solid rgba(220, 38, 38, 0.3);
+  border: 2px solid var(--border-primary);
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
   box-shadow: 
-    0 10px 25px -5px rgba(0, 0, 0, 0.7),
-    0 0 0 1px rgba(220, 38, 38, 0.2),
+    0 10px 25px -5px var(--shadow-secondary),
+    0 0 0 1px var(--border-primary),
     inset 0 1px 0 rgba(220, 38, 38, 0.1);
 }
 
@@ -249,13 +287,13 @@ body::before, .app-container::before {
 .service-title {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
   font-family: 'Poppins', sans-serif;
 }
 
 .service-description {
-  color: #9ca3af;
+  color: var(--text-secondary);
   font-size: 0.95rem;
   line-height: 1.5;
 }
@@ -263,9 +301,9 @@ body::before, .app-container::before {
 .input-field, select {
   padding: 0.875rem 1rem;
   border-radius: 12px;
-  border: 1px solid rgba(55, 55, 55, 0.5);
-  background: rgba(31, 31, 31, 0.8);
-  color: #ffffff;
+  border: 1px solid var(--border-secondary);
+  background: var(--bg-input);
+  color: var(--text-primary);
   font-size: 0.95rem;
   margin: 0.375rem auto;
   outline: none;
@@ -276,13 +314,13 @@ body::before, .app-container::before {
 }
 
 .input-field:focus, select:focus {
-  border-color: #dc2626;
+  border-color: var(--accent-red);
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
-  background: rgba(31, 31, 31, 1);
+  background: var(--bg-input);
 }
 
 .input-field::placeholder {
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .action-button {
@@ -318,17 +356,18 @@ body::before, .app-container::before {
 }
 
 .section {
-  background: linear-gradient(135deg, rgba(31, 31, 31, 0.9) 0%, rgba(15, 5, 5, 0.8) 50%, rgba(31, 31, 31, 0.9) 100%);
+  background: var(--bg-section);
   backdrop-filter: blur(10px);
   padding: 1.5rem;
   margin: 1.5rem 0;
   border-radius: 16px;
-  border: 1px solid rgba(55, 55, 55, 0.3);
+  border: 1px solid var(--border-secondary);
   position: relative;
   background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Coat_of_arms_of_Kenya.svg/1200px-Coat_of_arms_of_Kenya.svg.png');
   background-size: 150px 150px;
   background-position: center;
   background-repeat: no-repeat;
+  transition: all 0.3s ease;
 }
 
 .section::after {
@@ -363,7 +402,7 @@ body::before, .app-container::before {
   margin: 0 0 1rem 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .form-group {
@@ -376,7 +415,7 @@ body::before, .app-container::before {
 }
 
 .form-label {
-  color: #d1d5db;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   font-weight: 500;
 }
@@ -395,17 +434,18 @@ body::before, .app-container::before {
 }
 
 .booth-card, .queue-item {
-  background: rgba(31, 31, 31, 0.8);
+  background: var(--bg-input);
   padding: 1rem;
   border-radius: 12px;
   margin: 0.75rem 0;
-  border: 1px solid rgba(55, 55, 55, 0.3);
+  border: 1px solid var(--border-secondary);
   transition: all 0.3s ease;
+  color: var(--text-primary);
 }
 
 .booth-card:hover, .queue-item:hover {
-  background: rgba(31, 31, 31, 1);
-  border-color: rgba(75, 75, 75, 0.5);
+  background: var(--bg-section);
+  border-color: var(--border-primary);
 }
 
 .status-waiting { color: #f59e0b; }
@@ -432,22 +472,23 @@ body::before, .app-container::before {
 }
 
 .stat-card {
-  background: rgba(31, 31, 31, 0.8);
+  background: var(--bg-input);
   padding: 1.5rem;
   border-radius: 12px;
-  border: 1px solid rgba(55, 55, 55, 0.3);
+  border: 1px solid var(--border-secondary);
   text-align: center;
+  transition: all 0.3s ease;
 }
 
 .stat-number {
   font-size: 2rem;
   font-weight: 700;
-  color: #dc2626;
+  color: var(--accent-red);
   margin-bottom: 0.5rem;
 }
 
 .stat-label {
-  color: #9ca3af;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   font-weight: 500;
 }
@@ -477,5 +518,41 @@ body::before, .app-container::before {
   .input-field, select {
     width: 100%;
   }
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 2px solid var(--border-primary);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px var(--shadow-secondary);
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px var(--shadow-primary);
+  border-color: var(--accent-red);
+}
+
+[data-theme="light"] .theme-toggle {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .theme-toggle {
+  background: var(--bg-card);
+  color: var(--text-primary);
 }
 `;

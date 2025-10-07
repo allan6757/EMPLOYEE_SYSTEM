@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nairobi Registration Bureau - Project Presentation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', 'Calibri', 'Arial', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: #333;
+        }
+        .presentation { width: 100vw; height: 100vh; overflow: hidden; }
+        .slide { 
+            width: calc(100% - 40px); 
+            height: calc(100% - 40px); 
+            display: none; 
+            padding: 60px; 
+            position: relative;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            margin: 20px;
+        }
+        .slide.active { display: flex; flex-direction: column; justify-content: center; }
+        
+        .slide h1 { 
+            font-size: 2.8rem; 
+            color: #2c3e50; 
+            margin-bottom: 25px; 
+            text-align: center; 
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+        .slide h2 { 
+            font-size: 2.2rem; 
+            color: #3498db; 
+            margin-bottom: 20px; 
+            font-weight: 600;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .slide h3 { 
+            font-size: 1.6rem; 
+            color: #27ae60; 
+            margin-bottom: 15px; 
+            font-weight: 600;
+        }
+        .slide p { font-size: 1.2rem; line-height: 1.6; margin-bottom: 15px; }
+        .slide li { font-size: 1.1rem; line-height: 1.5; margin-bottom: 8px; }
+        .slide ul { margin-left: 30px; margin-bottom: 20px; }
+        
+        .title-slide { 
+            text-align: center; 
+            background: linear-gradient(135deg, #2c3e50, #3498db, #27ae60); 
+            color: white; 
+            position: relative;
+            overflow: hidden;
+        }
+        .title-slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 70%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        }
+        .title-slide h1 { 
+            font-size: 3.5rem; 
+            color: white; 
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+        .title-slide p { 
+            font-size: 1.6rem; 
+            opacity: 0.95; 
+            position: relative;
+            z-index: 1;
+        }
+        
+        .problem-slide { 
+            background: linear-gradient(135deg, #fff5f5, #fef2f2); 
+            border-left: 8px solid #e74c3c; 
+            position: relative;
+        }
+        .problem-slide::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border-radius: 50%;
+            opacity: 0.1;
+        }
+        .solution-slide { 
+            background: linear-gradient(135deg, #f0fdf4, #f7fef7); 
+            border-left: 8px solid #27ae60; 
+            position: relative;
+        }
+        .solution-slide::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #27ae60, #229954);
+            border-radius: 50%;
+            opacity: 0.1;
+        }
+        
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .comparison-table th, .comparison-table td { 
+            padding: 18px; 
+            text-align: left; 
+            border: 1px solid #e0e0e0; 
+        }
+        .comparison-table th { 
+            background: linear-gradient(135deg, #3498db, #2980b9); 
+            color: white; 
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .comparison-table tr:nth-child(even) { background: #f8f9fa; }
+        .comparison-table tr:hover { background: #e3f2fd; }
+        
+        .features-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 30px; 
+            margin: 20px 0; 
+        }
+        .feature-box { 
+            background: linear-gradient(135deg, #f8f9fa, #ffffff); 
+            padding: 25px; 
+            border-radius: 12px; 
+            border-left: 6px solid #27ae60; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .feature-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .controls { 
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+            z-index: 1000; 
+        }
+        .btn { 
+            background: linear-gradient(135deg, #3498db, #2980b9); 
+            color: white; 
+            border: none; 
+            padding: 14px 24px; 
+            margin: 5px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+        .btn:hover { 
+            background: linear-gradient(135deg, #2980b9, #3498db); 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+        }
+        
+        .slide-counter { 
+            position: fixed; 
+            bottom: 20px; 
+            left: 20px; 
+            background: linear-gradient(135deg, #2c3e50, #34495e); 
+            color: white; 
+            padding: 12px 18px; 
+            border-radius: 25px; 
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .highlight { 
+            background: linear-gradient(135deg, #fef3c7, #fde68a); 
+            padding: 4px 8px; 
+            border-radius: 6px; 
+            font-weight: 600;
+        }
+        .emphasis { 
+            color: #e74c3c; 
+            font-weight: 700; 
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .slide li {
+            position: relative;
+            padding-left: 20px;
+        }
+        .slide li::before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            color: #3498db;
+            font-size: 0.8em;
+        }
+        
+        .tech-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        
+        <!-- Slide 1: Title -->
+        <div class="slide active title-slide">
+            <h1>NAIROBI REGISTRATION BUREAU</h1>
+            <h2>DIGITAL SERVICE SYSTEM</h2>
+            <p style="margin-top: 40px;">Simplifying Citizen Services Through Technology</p>
+            <p style="margin-top: 30px; font-size: 1.2rem;">Employee & Citizen Management System</p>
+        </div>
+
+        <!-- Slide 2: The Problem -->
+        <div class="slide problem-slide">
+            <h1>THE PROBLEM I OBSERVED</h1>
+            <h2>WORKING AT NATIONAL REGISTRATION BUREAU</h2>
+            <ul>
+                <li>Long queues and waiting times</li>
+                <li>Manual paperwork processes</li>
+                <li>Citizens struggled to track their applications</li>
+                <li>No appointment booking system</li>
+                <li>Lost documents were hard to report</li>
+                <li>Employees had no digital tools</li>
+                <li>No real-time service updates</li>
+            </ul>
+            <p class="emphasis">RESULT: Frustrated citizens, inefficient service delivery</p>
+        </div>
+
+        <!-- Slide 3: Problem Analysis -->
+        <div class="slide">
+            <h1>PROBLEM ANALYSIS</h1>
+            <h2>MAIN ISSUES IDENTIFIED</h2>
+            <ul>
+                <li><strong>Citizens:</strong> No way to book appointments or track progress</li>
+                <li><strong>Employees:</strong> Manual processes, no digital dashboard</li>
+                <li><strong>Admin:</strong> No system oversight or monitoring</li>
+                <li><strong>Documents:</strong> Hard to track production status</li>
+                <li><strong>Communication:</strong> No direct citizen-employee contact</li>
+            </ul>
+            <p class="emphasis">IMPACT: Wasted time, poor service quality, citizen dissatisfaction</p>
+        </div>
+
+        <!-- Slide 4: Solution Approach -->
+        <div class="slide solution-slide">
+            <h1>MY SOLUTION APPROACH</h1>
+            <h2>DIGITAL TRANSFORMATION STRATEGY</h2>
+            <ul>
+                <li>Multi-portal system for different user types</li>
+                <li>Online appointment booking</li>
+                <li>Real-time document tracking</li>
+                <li>Digital ID with QR codes</li>
+                <li>Employee dashboard for booth management</li>
+                <li>Admin panel for system oversight</li>
+            </ul>
+            <p class="emphasis">GOAL: Make services accessible, trackable, and efficient</p>
+        </div>
+
+        <!-- Slide 5: System Architecture -->
+        <div class="slide">
+            <h1>SYSTEM ARCHITECTURE</h1>
+            <h2>FOUR MAIN PORTALS</h2>
+            <div class="features-grid">
+                <div class="feature-box">
+                    <h3>1. Citizen Services</h3>
+                    <p>Book appointments, track documents</p>
+                </div>
+                <div class="feature-box">
+                    <h3>2. Employee Dashboard</h3>
+                    <p>Manage booth operations</p>
+                </div>
+                <div class="feature-box">
+                    <h3>3. Admin Panel</h3>
+                    <p>System oversight and management</p>
+                </div>
+                <div class="feature-box">
+                    <h3>4. Registration Portal</h3>
+                    <p>New citizen registration</p>
+                </div>
+            </div>
+            <p><strong>TECHNOLOGY:</strong> 
+                <span class="tech-badge">React</span>
+                <span class="tech-badge">Vite</span>
+                <span class="tech-badge">Modern Web</span>
+            </p>
+        </div>
+
+        <!-- Slide 6: Key Features -->
+        <div class="slide">
+            <h1>KEY FEATURES IMPLEMENTED</h1>
+            <div class="features-grid">
+                <div>
+                    <h2>FOR CITIZENS</h2>
+                    <ul>
+                        <li>Digital ID display with QR codes</li>
+                        <li>Appointment booking system</li>
+                        <li>Document status tracking</li>
+                        <li>Lost ID reporting</li>
+                        <li>Queue management</li>
+                    </ul>
+                </div>
+                <div>
+                    <h2>FOR EMPLOYEES</h2>
+                    <ul>
+                        <li>Booth management dashboard</li>
+                        <li>Citizen verification tools</li>
+                        <li>Service processing interface</li>
+                        <li>Real-time chat system</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Problem Solutions -->
+        <div class="slide">
+            <h1>PROBLEM SOLUTIONS</h1>
+            <h2>BEFORE vs AFTER</h2>
+            <table class="comparison-table">
+                <tr>
+                    <th>Problem</th>
+                    <th>Solution</th>
+                </tr>
+                <tr>
+                    <td>Long queues</td>
+                    <td>Online appointment booking</td>
+                </tr>
+                <tr>
+                    <td>No tracking</td>
+                    <td>Real-time document status</td>
+                </tr>
+                <tr>
+                    <td>Manual processes</td>
+                    <td>Digital employee dashboard</td>
+                </tr>
+                <tr>
+                    <td>Lost documents</td>
+                    <td>Online reporting system</td>
+                </tr>
+                <tr>
+                    <td>Poor communication</td>
+                    <td>Built-in chat system</td>
+                </tr>
+                <tr>
+                    <td>No oversight</td>
+                    <td>Admin monitoring panel</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Slide 8: System Benefits -->
+        <div class="slide">
+            <h1>SYSTEM BENEFITS</h1>
+            <div class="features-grid">
+                <div class="feature-box">
+                    <h3>FOR CITIZENS</h3>
+                    <ul>
+                        <li>Save time with appointments</li>
+                        <li>Track services online</li>
+                        <li>Digital ID access</li>
+                        <li>Reduced physical visits</li>
+                    </ul>
+                </div>
+                <div class="feature-box">
+                    <h3>FOR EMPLOYEES</h3>
+                    <ul>
+                        <li>Streamlined workflows</li>
+                        <li>Digital tools for efficiency</li>
+                        <li>Better citizen management</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="feature-box" style="margin-top: 20px;">
+                <h3>FOR ORGANIZATION</h3>
+                <ul>
+                    <li>Improved service delivery • Better data management • Reduced operational costs</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 9: Technical Implementation -->
+        <div class="slide">
+            <h1>TECHNICAL IMPLEMENTATION</h1>
+            <h2>CORE FEATURES</h2>
+            <ul>
+                <li>Multi-level authentication</li>
+                <li>Biometric key generation</li>
+                <li>Document production tracking</li>
+                <li>Queue management system</li>
+                <li>Real-time notifications</li>
+                <li>Mobile-responsive design</li>
+            </ul>
+            <p class="emphasis">SECURITY: Fraud detection, secure login, data protection</p>
+        </div>
+
+        <!-- Slide 10: Impact & Results -->
+        <div class="slide">
+            <h1>IMPACT & RESULTS</h1>
+            <h2>EXPECTED IMPROVEMENTS</h2>
+            <ul>
+                <li><span class="highlight">70% reduction</span> in waiting times</li>
+                <li><span class="highlight">90% faster</span> document tracking</li>
+                <li><span class="highlight">100% digital</span> service records</li>
+                <li><span class="highlight">24/7</span> service accessibility</li>
+                <li>Improved citizen satisfaction</li>
+            </ul>
+            <p class="emphasis">SCALABILITY: Can serve multiple registration centers</p>
+        </div>
+
+        <!-- Slide 11: Conclusion -->
+        <div class="slide solution-slide">
+            <h1>CONCLUSION</h1>
+            <h2>PROJECT SUMMARY</h2>
+            <ul>
+                <li>Identified real-world problems at National Registration Bureau</li>
+                <li>Developed comprehensive digital solution</li>
+                <li>Created user-friendly interfaces for all stakeholders</li>
+                <li>Implemented modern web technologies</li>
+                <li>Focused on efficiency and user experience</li>
+            </ul>
+            <p class="emphasis">OUTCOME: Transformed manual processes into digital workflows</p>
+        </div>
+
+        <!-- Slide 12: Thank You -->
+        <div class="slide title-slide">
+            <h1>THANK YOU</h1>
+            <h2>QUESTIONS & DISCUSSION</h2>
+            <p style="margin-top: 40px;">Nairobi Registration Bureau</p>
+            <p>Digital Service System</p>
+        </div>
+
+    </div>
+
+    <div class="controls">
+        <button class="btn" onclick="previousSlide()">← Previous</button>
+        <button class="btn" onclick="nextSlide()">Next →</button>
+    </div>
+
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">12</span>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('total-slides').textContent = totalSlides;
+        
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+        }
+        
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function previousSlide() { showSlide(currentSlide - 1); }
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+        });
+    </script>
+</body>
+</html>
