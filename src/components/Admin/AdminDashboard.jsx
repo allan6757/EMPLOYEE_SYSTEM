@@ -28,7 +28,10 @@ const AdminDashboard = ({
   biometricResults,
   searchBiometric,
   showBiometricSearch,
-  setShowBiometricSearch
+  setShowBiometricSearch,
+  sendAdminMessage,
+  newMessage,
+  setNewMessage
 }) => {
   const adminUser = { name: 'Admin', booth: { name: 'Control Panel' } };
   
@@ -305,6 +308,9 @@ const AdminDashboard = ({
           chats={chats}
           title="Employee Messages"
           replyToMessage={replyToMessage}
+          newMessage={newMessage}
+          setNewMessage={setNewMessage}
+          sendMessage={sendAdminMessage}
         />
       )}
     </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Layout/Header';
 import ServiceCard from './components/Layout/ServiceCard';
 import EmployeeLogin from './components/Employee/EmployeeLogin';
@@ -10,6 +10,9 @@ import Popup from './components/Layout/Popup';
 import SidePanel from './components/Layout/SidePanel';
 import CitizenLogin from './components/Citizen/CitizenLogin';
 import LoginScreen from './components/Auth/LoginScreen';
+import SignupForm from './components/Auth/SignupForm';
+import ErrorBoundary from './components/Layout/ErrorBoundary';
+import LoadingSpinner from './components/Layout/LoadingSpinner';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { 
   getFormattedDate, 
@@ -20,11 +23,17 @@ import {
   runFraudChecks 
 } from './utils/helpers';
 import { globalStyles } from './styles/globalStyles';
+import { logger } from './utils/logger';
+import { sanitizeInput, checkRateLimit, isSessionValid } from './utils/security';
 
 const App = () => {
   const appId = 'registration-bureau-app';
-  const ADMIN_PASSWORD = 'allan123';
-  const SECURITY_KEY = 'ALLAN123';
+  const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'allan123';
+  const SECURITY_KEY = import.meta.env.VITE_SECURITY_KEY || 'ALLAN123';
+  const [isLoading, setIsLoading] = useState(true);
+  const [lastActivity, setLastActivity] = useState(Date.now());
+  const [showSignup, setShowSignup] = useState(false);
+  const [userAccounts, setUserAccounts] = useLocalStorage(`userAccounts_${appId}`, []);
 
   // Authentication & User State
   const [currentUser, setCurrentUser] = useState(null);
@@ -182,11 +191,49 @@ const App = () => {
     }
   ];
 
-  // Force fresh data by clearing localStorage first
-  React.useEffect(() => {
-    localStorage.removeItem(`citizenDatabase_${appId}`);
-    localStorage.removeItem(`booths_${appId}`);
-    localStorage.removeItem(`employees_${appId}`);
+  // Initialize app and session management
+  useEffect(() => {
+    const initializeApp = async () => {
+      try {
+        logger.info('Initializing Nairobi Registration Bureau System');
+        
+        // Check session validity
+        const storedActivity = localStorage.getItem('lastActivity');
+        if (storedActivity && !isSessionValid(parseInt(storedActivity))) {
+          logger.warn('Session expired, clearing data');
+          localStorage.clear();
+        }
+        
+        // In development, clear data for fresh start
+        if (import.meta.env.DEV) {
+          localStorage.removeItem(`citizenDatabase_${appId}`);
+          localStorage.removeItem(`booths_${appId}`);
+          localStorage.removeItem(`employees_${appId}`);
+        }
+        
+        setIsLoading(false);
+      } catch (error) {
+        logger.error('App initialization failed', error);
+        setIsLoading(false);
+      }
+    };
+    
+    initializeApp();
+    
+    // Update activity on user interaction
+    const updateActivity = () => {
+      const now = Date.now();
+      setLastActivity(now);
+      localStorage.setItem('lastActivity', now.toString());
+    };
+    
+    document.addEventListener('click', updateActivity);
+    document.addEventListener('keypress', updateActivity);
+    
+    return () => {
+      document.removeEventListener('click', updateActivity);
+      document.removeEventListener('keypress', updateActivity);
+    };
   }, []);
 
   // Data Management with localStorage
@@ -202,7 +249,26 @@ const App = () => {
   // State Management
   const [activeBooths, setActiveBooths] = useState(new Set());
   const [currentServing, setCurrentServing] = useState({});
-  const [chats, setChats] = useState([]);
+  const [chats, setChats] = useLocalStorage(`chats_${appId}`, [
+    {
+      id: 1,
+      from: 'ALLAN MAINA',
+      fromType: 'employee',
+      boothId: 'B002',
+      message: 'Good morning Admin! The replacement booth is ready for service.',
+      timestamp: '09:15 AM',
+      date: getFormattedDate()
+    },
+    {
+      id: 2,
+      from: 'Admin',
+      fromType: 'admin',
+      replyTo: 1,
+      message: 'Good morning Allan! Thank you for the update. How many citizens are in queue?',
+      timestamp: '09:18 AM',
+      date: getFormattedDate()
+    }
+  ]);
   const [showChat, setShowChat] = useState(false);
   const [newMessage, setNewMessage] = useState('');
   const [popup, setPopup] = useState(null);
@@ -231,20 +297,115 @@ const App = () => {
     setPopup({ message, type });
   };
 
-  // Main Authentication
+  // Main Authentication with security enhancements
   const handleMainLogin = (loginData) => {
+    const sanitizedIdentifier = sanitizeInput(loginData.identifier);
+    
+    // Rate limiting
+    if (!checkRateLimit(sanitizedIdentifier)) {
+      showPopup('Too many login attempts. Please try again later.', 'error');
+      return;
+    }
+    
+    // Check user accounts first
+    const userAccount = userAccounts.find(u => 
+      (u.email === sanitizedIdentifier || u.phoneNumber === sanitizedIdentifier) &&
+      u.password === loginData.password
+    );
+    
+    if (userAccount) {
+      // Find corresponding citizen data
+      const citizen = citizenDatabase.find(c => c.email === userAccount.email);
+      if (citizen) {
+        setCurrentCitizen(citizen);
+        setIsAuthenticated(true);
+        setLastActivity(Date.now());
+        logger.info('User authenticated successfully', { userId: citizen.id });
+        showPopup(`Welcome ${citizen.firstName} ${citizen.lastName}!`, 'success');
+        return;
+      }
+    }
+    
+    // Fallback to default demo account
     const citizen = citizenDatabase.find(c => 
-      (c.email === loginData.identifier || c.phoneNumber === loginData.identifier) &&
+      (c.email === sanitizedIdentifier || c.phoneNumber === sanitizedIdentifier) &&
       loginData.password === 'kenya123'
     );
     
     if (citizen) {
       setCurrentCitizen(citizen);
       setIsAuthenticated(true);
+      setLastActivity(Date.now());
+      logger.info('User authenticated successfully', { userId: citizen.id });
       showPopup(`Welcome ${citizen.firstName} ${citizen.lastName}!`, 'success');
     } else {
-      showPopup('Invalid credentials. Try: james.mwangi@email.com / kenya123', 'error');
+      logger.warn('Authentication failed', { identifier: sanitizedIdentifier });
+      showPopup('Invalid credentials. Try creating an account or use demo: james.mwangi@email.com / kenya123', 'error');
     }
+  };
+
+  // User Signup
+  const handleSignup = (signupData) => {
+    // Check if user already exists
+    const existingUser = userAccounts.find(u => 
+      u.email === signupData.email || u.phoneNumber === signupData.phoneNumber || u.idNumber === signupData.idNumber
+    );
+    
+    if (existingUser) {
+      showPopup('Account already exists with this email, phone, or ID number', 'error');
+      return;
+    }
+    
+    // Check if citizen with same ID exists
+    const existingCitizen = citizenDatabase.find(c => c.idNumber === signupData.idNumber);
+    if (existingCitizen) {
+      showPopup('A citizen record already exists with this ID number', 'error');
+      return;
+    }
+    
+    // Create user account
+    const newUserAccount = {
+      id: Date.now(),
+      email: signupData.email,
+      phoneNumber: signupData.phoneNumber,
+      password: signupData.password,
+      idNumber: signupData.idNumber,
+      createdAt: new Date().toISOString()
+    };
+    
+    // Create citizen record
+    const newCitizen = {
+      id: Date.now() + 1,
+      idNumber: signupData.idNumber,
+      firstName: signupData.firstName,
+      lastName: signupData.lastName,
+      dateOfBirth: signupData.dateOfBirth || '1990-01-01',
+      placeOfBirth: 'Kenya',
+      nationality: 'Kenyan',
+      gender: 'Not Specified',
+      phoneNumber: signupData.phoneNumber,
+      email: signupData.email,
+      address: 'Kenya',
+      registrationDate: new Date().toISOString().split('T')[0],
+      issueDate: new Date().toISOString().split('T')[0],
+      expiryDate: new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 10 years
+      status: 'active',
+      documentStatus: 'issued',
+      biometricKey: `BIO-${signupData.idNumber}-${new Date().getFullYear()}`
+    };
+    
+    // Save to storage
+    setUserAccounts([...userAccounts, newUserAccount]);
+    setCitizenDatabase([...citizenDatabase, newCitizen]);
+    
+    logger.info('New user account created', { userId: newUserAccount.id });
+    showPopup(`Account created successfully! Welcome ${signupData.firstName}!`, 'success');
+    
+    // Auto login
+    setCurrentCitizen(newCitizen);
+    setIsAuthenticated(true);
+    setLastActivity(Date.now());
+    setShowSignup(false);
   };
 
   // Citizen Authentication
@@ -497,22 +658,24 @@ const App = () => {
     if (!newMessage.trim()) return;
     
     const message = {
-      id: Date.now(),
-      from: currentUser.name,
+      id: Date.now() + Math.random(),
+      from: currentUser?.name || 'Employee',
       fromType: 'employee',
-      boothId: currentUser.boothId,
+      boothId: currentUser?.boothId || null,
       message: newMessage,
       timestamp: getFormattedTime(),
       date: getFormattedDate()
     };
     
-    setChats([...chats, message]);
+    setChats(prevChats => [...prevChats, message]);
     setNewMessage('');
   };
 
   const replyToMessage = (messageId, reply) => {
+    if (!reply.trim()) return;
+    
     const replyMessage = {
-      id: Date.now(),
+      id: Date.now() + Math.random(),
       from: 'Admin',
       fromType: 'admin',
       replyTo: messageId,
@@ -521,30 +684,73 @@ const App = () => {
       date: getFormattedDate()
     };
     
-    setChats([...chats, replyMessage]);
+    setChats(prevChats => [...prevChats, replyMessage]);
   };
+
+  const sendAdminMessage = () => {
+    if (!newMessage.trim()) return;
+    
+    const message = {
+      id: Date.now() + Math.random(),
+      from: 'Admin',
+      fromType: 'admin',
+      boothId: null,
+      message: newMessage,
+      timestamp: getFormattedTime(),
+      date: getFormattedDate()
+    };
+    
+    setChats(prevChats => [...prevChats, message]);
+    setNewMessage('');
+  };
+
+  if (isLoading) {
+    return (
+      <ErrorBoundary>
+        <div className="app-container">
+          <style>{globalStyles}</style>
+          <LoadingSpinner message="Initializing Nairobi Registration Bureau..." />
+        </div>
+      </ErrorBoundary>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
-      <div className="app-container">
-        <style>{globalStyles}</style>
-        {popup && (
-          <Popup
-            message={popup.message}
-            type={popup.type}
-            onClose={() => setPopup(null)}
-          />
-        )}
-        <LoginScreen onLogin={handleMainLogin} showPopup={showPopup} />
-      </div>
+      <ErrorBoundary>
+        <div className="app-container">
+          <style>{globalStyles}</style>
+          {popup && (
+            <Popup
+              message={popup.message}
+              type={popup.type}
+              onClose={() => setPopup(null)}
+            />
+          )}
+          {showSignup ? (
+            <SignupForm 
+              onSignup={handleSignup} 
+              showPopup={showPopup}
+              onBackToLogin={() => setShowSignup(false)}
+            />
+          ) : (
+            <LoginScreen 
+              onLogin={handleMainLogin} 
+              showPopup={showPopup}
+              onShowSignup={() => setShowSignup(true)}
+            />
+          )}
+        </div>
+      </ErrorBoundary>
     );
   }
 
   return (
-    <div className="app-container">
-      <style>{globalStyles}</style>
+    <ErrorBoundary>
+      <div className="app-container">
+        <style>{globalStyles}</style>
 
-      <div className="main-card">
+        <div className="main-card">
         <Header />
         <div className="coat-of-arms"></div>
 
@@ -850,6 +1056,9 @@ const App = () => {
             setShowChat={setShowChat}
             chats={chats}
             replyToMessage={replyToMessage}
+            sendAdminMessage={sendAdminMessage}
+            newMessage={newMessage}
+            setNewMessage={setNewMessage}
             logout={logout}
             getFormattedDate={getFormattedDate}
             onBackToServices={logout}
@@ -864,6 +1073,7 @@ const App = () => {
         )}
       </div>
     </div>
+    </ErrorBoundary>
   );
 };
 

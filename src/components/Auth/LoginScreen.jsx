@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const LoginScreen = ({ onLogin, showPopup }) => {
+const LoginScreen = ({ onLogin, showPopup, onShowSignup }) => {
   const [loginForm, setLoginForm] = useState({ identifier: '', password: '' });
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -135,10 +135,35 @@ const LoginScreen = ({ onLogin, showPopup }) => {
               fontSize: '1.1rem',
               fontWeight: '600',
               cursor: 'pointer',
-              transition: 'transform 0.2s ease'
+              transition: 'transform 0.2s ease',
+              marginBottom: '15px'
             }}
           >
             LOGIN
+          </button>
+
+          <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+            <span style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.9rem' }}>
+              Don't have an account?
+            </span>
+          </div>
+
+          <button
+            onClick={onShowSignup}
+            style={{
+              width: '100%',
+              padding: '12px',
+              borderRadius: '8px',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              background: 'transparent',
+              color: '#ffffff',
+              fontSize: '1rem',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            CREATE ACCOUNT
           </button>
         </div>
       </div>
