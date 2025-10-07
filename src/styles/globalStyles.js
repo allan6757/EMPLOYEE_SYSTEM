@@ -20,11 +20,29 @@ export const globalStyles = `
 }
 
 [data-theme="light"] {
-  /* Light theme variables - Clean & Professional */
-  --bg-primary: linear-gradient(135deg, #ffffff 0%, #f8fafc 25%, #ffffff 50%, #f0fdf4 75%, #ffffff 100%);
+  /* Light theme variables - Kenya Flag Inspired */
+  --bg-primary: linear-gradient(135deg, 
+    #fefefe 0%, 
+    #fef7f7 15%, 
+    #ffffff 30%, 
+    #f8fffe 45%, 
+    #ffffff 60%, 
+    #f7fef7 75%, 
+    #fefefe 100%
+  );
   --bg-secondary: rgba(255, 255, 255, 0.98);
-  --bg-card: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 50%, rgba(255, 255, 255, 0.95) 100%);
-  --bg-section: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 50%, rgba(255, 255, 255, 0.95) 100%);
+  --bg-card: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.95) 0%, 
+    rgba(254, 249, 249, 0.9) 25%, 
+    rgba(255, 255, 255, 0.95) 50%, 
+    rgba(248, 254, 248, 0.9) 75%, 
+    rgba(255, 255, 255, 0.95) 100%
+  );
+  --bg-section: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.96) 0%, 
+    rgba(254, 250, 250, 0.92) 50%, 
+    rgba(255, 255, 255, 0.96) 100%
+  );
   --bg-input: rgba(255, 255, 255, 0.98);
   --text-primary: #0f172a;
   --text-secondary: #1e293b;
@@ -42,9 +60,7 @@ export const globalStyles = `
 }
 
 body, .app-container {
-  background: var(--bg-primary),
-             radial-gradient(circle at 20% 20%, rgba(220, 38, 38, 0.1) 0%, transparent 50%),
-             radial-gradient(circle at 80% 80%, rgba(34, 139, 34, 0.1) 0%, transparent 50%);
+  background: var(--bg-primary);
   min-height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--text-primary);
@@ -56,7 +72,23 @@ body, .app-container {
   transition: all 0.3s ease;
 }
 
-body::before, .app-container::before {
+[data-theme="dark"] body,
+[data-theme="dark"] .app-container {
+  background: var(--bg-primary),
+             radial-gradient(circle at 20% 20%, rgba(220, 38, 38, 0.1) 0%, transparent 50%),
+             radial-gradient(circle at 80% 80%, rgba(34, 139, 34, 0.1) 0%, transparent 50%);
+}
+
+[data-theme="light"] body,
+[data-theme="light"] .app-container {
+  background: var(--bg-primary),
+             radial-gradient(circle at 15% 25%, rgba(220, 38, 38, 0.03) 0%, transparent 40%),
+             radial-gradient(circle at 85% 75%, rgba(34, 139, 34, 0.03) 0%, transparent 40%),
+             radial-gradient(circle at 50% 10%, rgba(0, 0, 0, 0.02) 0%, transparent 30%);
+}
+
+[data-theme="dark"] body::before,
+[data-theme="dark"] .app-container::before {
   content: '';
   position: fixed;
   top: 0;
@@ -68,6 +100,23 @@ body::before, .app-container::before {
     radial-gradient(circle at 75% 75%, rgba(34, 139, 34, 0.05) 0%, transparent 25%),
     linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.02) 49%, rgba(255, 255, 255, 0.02) 51%, transparent 52%);
   background-size: 200px 200px, 200px 200px, 50px 50px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+[data-theme="light"] body::before,
+[data-theme="light"] .app-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(220, 38, 38, 0.02) 0%, transparent 30%),
+    radial-gradient(circle at 80% 70%, rgba(34, 139, 34, 0.02) 0%, transparent 30%),
+    linear-gradient(45deg, transparent 48%, rgba(0, 0, 0, 0.01) 49%, rgba(0, 0, 0, 0.01) 51%, transparent 52%);
+  background-size: 300px 300px, 300px 300px, 80px 80px;
   pointer-events: none;
   z-index: -1;
 }
