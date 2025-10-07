@@ -5,16 +5,24 @@ const LoginScreen = ({ onLogin, showPopup, onShowSignup }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const kenyaImages = [
-    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=800&fit=crop',
-    'https://images.unsplash.com/photo-1571771019784-3ff35f4f4277?w=1200&h=800&fit=crop',
-    'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=1200&h=800&fit=crop',
-    'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1200&h=800&fit=crop'
+    // Kenya Olympians and Athletes
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&h=800&fit=crop', // Athletes running
+    'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=1200&h=800&fit=crop', // Marathon runners
+    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&h=800&fit=crop', // Track and field
+    // Maasai Culture
+    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=800&fit=crop', // Maasai warriors
+    'https://images.unsplash.com/photo-1571771019784-3ff35f4f4277?w=1200&h=800&fit=crop', // Traditional dress
+    'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1200&h=800&fit=crop', // Cultural ceremony
+    // Kenyan Youth
+    'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=1200&h=800&fit=crop', // Young students
+    'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1200&h=800&fit=crop', // Youth technology
+    'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=1200&h=800&fit=crop'  // Young professionals
   ];
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % kenyaImages.length);
-    }, 4000);
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
