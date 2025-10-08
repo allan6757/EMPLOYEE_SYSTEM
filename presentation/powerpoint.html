@@ -54,7 +54,7 @@
         .title-slide { 
             text-align: center; 
             background: linear-gradient(135deg, #2c3e50, #3498db, #27ae60); 
-            color: white; 
+            color: rgb(0, 0, 0); 
             position: relative;
             overflow: hidden;
         }
@@ -65,7 +65,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at 30% 70%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            background: radial-gradient(circle at 30% 70%, rgba(5, 4, 4, 0.1) 0%, transparent 50%);
         }
         .title-slide h1 { 
             font-size: 3.5rem; 
@@ -74,11 +74,16 @@
             position: relative;
             z-index: 1;
         }
+        .title-slide h2 {
+            color: black;
+            border-bottom: none;
+        }
         .title-slide p { 
             font-size: 1.6rem; 
             opacity: 0.95; 
             position: relative;
             z-index: 1;
+            color: black;
         }
         
         .problem-slide { 
@@ -205,11 +210,11 @@
             padding-left: 20px;
         }
         .slide li::before {
-            content: '▶';
+            content: '•';
             position: absolute;
             left: 0;
             color: #3498db;
-            font-size: 0.8em;
+            font-size: 1.2em;
         }
         
         .tech-badge {
@@ -233,6 +238,7 @@
             <h2>DIGITAL SERVICE SYSTEM</h2>
             <p style="margin-top: 40px;">Simplifying Citizen Services Through Technology</p>
             <p style="margin-top: 30px; font-size: 1.2rem;">Employee & Citizen Management System</p>
+            <p style="margin-top: 40px; font-size: 1.4rem; font-weight: 600;">ALLAN MAINA 23-1446</p>
         </div>
 
         <!-- Slide 2: The Problem -->
@@ -396,7 +402,9 @@
             <div class="feature-box" style="margin-top: 20px;">
                 <h3>FOR ORGANIZATION</h3>
                 <ul>
-                    <li>Improved service delivery • Better data management • Reduced operational costs</li>
+                    <li>Improved service delivery</li>
+                <li>Better data management</li>
+                <li>Reduced operational costs</li>
                 </ul>
             </div>
         </div>
@@ -447,7 +455,7 @@
         <!-- Slide 12: Thank You -->
         <div class="slide title-slide">
             <h1>THANK YOU</h1>
-            <h2>QUESTIONS & DISCUSSION</h2>
+            <h2>QUESTIONS</h2>
             <p style="margin-top: 40px;">Nairobi Registration Bureau</p>
             <p>Digital Service System</p>
         </div>

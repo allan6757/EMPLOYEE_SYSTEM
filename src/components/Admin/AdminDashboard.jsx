@@ -57,6 +57,22 @@ const AdminDashboard = ({
         onBackToServices={onBackToServices}
       />
 
+      <div style={{ padding: '1rem', textAlign: 'center', background: 'rgba(31, 31, 31, 0.8)', borderBottom: '1px solid rgba(55, 55, 55, 0.5)' }}>
+        <button 
+          className="action-button"
+          onClick={() => setShowRegisteredCitizens(true)}
+          style={{
+            padding: '0.875rem 2rem',
+            fontSize: '1rem',
+            fontWeight: '600',
+            background: 'linear-gradient(135deg, var(--accent-red) 0%, #b91c1c 100%)',
+            boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)'
+          }}
+        >
+          Search Registered Citizens ({citizenDatabase.length})
+        </button>
+      </div>
+
       <div className="grid">
         <div className="section">
           <h3>Add New Booth</h3>
@@ -311,21 +327,7 @@ const AdminDashboard = ({
             </div>
           </div>
           
-          <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-            <button 
-              className="action-button"
-              onClick={() => setShowRegisteredCitizens(true)}
-              style={{
-                padding: '0.875rem 2rem',
-                fontSize: '1rem',
-                fontWeight: '600',
-                background: 'linear-gradient(135deg, var(--accent-red) 0%, #b91c1c 100%)',
-                boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)'
-              }}
-            >
-              View Registered Citizens ({citizenDatabase.length})
-            </button>
-          </div>
+
         </div>
       </div>
 

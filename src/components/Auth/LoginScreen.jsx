@@ -6,17 +6,17 @@ const LoginScreen = ({ onLogin, showPopup, onShowSignup }) => {
 
   const kenyaImages = [
     // Kenya Olympians and Athletes
-    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&h=800&fit=crop', // Athletes running
-    'https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=1200&h=800&fit=crop', // Marathon runners
-    'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&h=800&fit=crop', // Track and field
+    'https://imgs.search.brave.com/sxn6pXA5rTg0n9iaOWj8aC2o9POaP_ryRoam7NAsXhU/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTIz/NDUxMTMyMC9waG90/by8yMDIwLXN1bW1l/ci1vbHltcGljcy1r/ZW55YS1mZXJndXNv/bi1yb3RpY2gtdmlj/dG9yaW91cy1ob2xk/aW5nLWtlbnlhbi1m/bGFnLWFmdGVyLW1l/bnMtODAwbS5qcGc_/cz02MTJ4NjEyJnc9/MCZrPTIwJmM9ck5f/bU9HdE01UXAwUUR3/ampOaXVFbXpOYzA4/dDBKUWVNd3A3S2p6/MTJsZz0', // Athletes running
+    'https://imgs.search.brave.com/pqq-J96lowC1R-Wtja1WZReo8kgkc1SZ879HyzYoJpQ/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvNTEy/MTMxNjQvcGhvdG8v/a2VueWFzLWV6ZWtp/YWwta2VtYm9pLWNv/bXBhdHJpb3QtYnJp/bWluLWtpcHJ1dG8t/cWF0YXJzLW11c2Et/b2JhaWQtYW1lci1h/bmQta2VueWFzLXBh/dWwta2lwc2llbGUu/anBnP3M9NjEyeDYx/MiZ3PTAmaz0yMCZj/PXJsTEVNcy0zaEox/MUhjdzZzMnlKMWt6/blZhZzBwdk9RS0sz/bnphZzh4QXc9', // Marathon runners
+    'https://imgs.search.brave.com/eZ9xDQK0OJ73Oya3mYvvU09mklAgnvnzJh-IsynKK1s/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvNTEy/MTM2NzcvcGhvdG8v/bWVucy0zMDAwbS1z/dGVlcGxlY2hhc2Ut/Z29sZC13aW5uZXIt/ZXpla2lhbC1rZW1i/b2ktb2Yta2VueWEt/YW5kLWNvbXBhdHJp/b3RzLWJyb256ZS13/aW5uZXItcGF1bC5q/cGc_cz02MTJ4NjEy/Jnc9MCZrPTIwJmM9/ZzNFREE0ZXhYeGFB/QnZ5TkxEQkNOVjBP/YktWRmx2alRnMFFx/ZlM2TWhtTT0', // Track and field
     // Maasai Culture
-    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=800&fit=crop', // Maasai warriors
-    'https://images.unsplash.com/photo-1571771019784-3ff35f4f4277?w=1200&h=800&fit=crop', // Traditional dress
-    'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1200&h=800&fit=crop', // Cultural ceremony
+    'https://imgs.search.brave.com/BT97x29x_YzGCAO854_qTU3Ai1MuA89yuCLga8LSjK4/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9iaWds/aWZlLm9yZy9pbWFn/ZXMvTWFhc2FpLU9s/eW1waWNzL2hvbWUv/bWFhc2FpLWhvbWUt/d29tZW4tMDEtODAw/eC5qcGc', // Maasai warriors
+    'https://imgs.search.brave.com/mHgN8_9hPUvzyU9pUWbNFNaIjeFJmizsuCO3NcnD9pc/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMudW5zcGxhc2gu/Y29tL3Bob3RvLTE1/MTU2NTgzMjM0MDYt/MjVkNjFjMTQxYTZl/P2ZtPWpwZyZxPTYw/Jnc9MzAwMCZpeGxp/Yj1yYi00LjEuMCZp/eGlkPU0zd3hNakEz/ZkRCOE1IeHpaV0Z5/WTJoOE9IeDhhMlZ1/ZVdGOFpXNThNSHg4/TUh4OGZEQT0', // Traditional dress
+    'https://imgs.search.brave.com/8MGYPTI8YU7zLGR_7ldpxak2Ya5v6tnvlWUInaFirvw/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9iaWds/aWZlLm9yZy9pbWFn/ZXMvTWFhc2FpLU9s/eW1waWNzL2hvbWUv/bWFhc2FpLWhvbWUt/aGlnaC1qdW1wLTAx/LTJ4LTgwMHguanBn', // Cultural ceremony
     // Kenyan Youth
-    'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=1200&h=800&fit=crop', // Young students
-    'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1200&h=800&fit=crop', // Youth technology
-    'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=1200&h=800&fit=crop'  // Young professionals
+    'https://imgs.search.brave.com/BcZkBD5dVvdmLvD6SBYA6sqGj0zmyAvpN8_uJz-5fK0/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pY2hl/Zi5iYmNpLmNvLnVr/L2FjZS9zdGFuZGFy/ZC85NzYvbWNzL21l/ZGlhL2ltYWdlcy82/NjE3OTAwMC9qcGcv/XzY2MTc5ODc5XzAx/NzM5NzA4OS5qcGc', // Young students
+    'https://imgs.search.brave.com/M2nWB9jz60EEd9v3orBr-NkIFbGJMeOnncKM20ZTDBQ/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9jZG4u/dHVrby5jby5rZS9p/bWFnZXMvMTEyMC8w/ZmdqaHM2azdldTU4/aWUuanBlZz92PTE', // Youth technology
+    'https://imgs.search.brave.com/4uMdCkQoqjKVDvhIND-Zqkf9Jxve0lXRYdDAw8-FChM/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvNDUz/NDY5NTA3L3Bob3Rv/L2dpcmFmZmUtZmFt/aWx5LmpwZz9zPTYx/Mng2MTImdz0wJms9/MjAmYz1NSi1adGQt/aHFjLU00ZXl4bEpj/VzJ0SzVKRDA1NGM0/ZEc3RzVCcWtqVkFB/PQ'  // Young professionals
   ];
 
   useEffect(() => {

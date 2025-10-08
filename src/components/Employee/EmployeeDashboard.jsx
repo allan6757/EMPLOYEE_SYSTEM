@@ -48,6 +48,22 @@ const EmployeeDashboard = ({
         onBackToServices={onBackToServices}
       />
 
+      <div style={{ padding: '1rem', textAlign: 'center', background: 'rgba(31, 31, 31, 0.8)', borderBottom: '1px solid rgba(55, 55, 55, 0.5)' }}>
+        <button 
+          className="action-button"
+          onClick={() => setShowRegisteredCitizens(true)}
+          style={{
+            padding: '0.875rem 2rem',
+            fontSize: '1rem',
+            fontWeight: '600',
+            background: 'linear-gradient(135deg, var(--accent-green) 0%, #1e7e1e 100%)',
+            boxShadow: '0 4px 12px rgba(34, 139, 34, 0.3)'
+          }}
+        >
+          Search Registered Citizens ({citizenDatabase.length})
+        </button>
+      </div>
+
       <div className="grid">
         <div className="section">
           <h3>All Appointments</h3>
@@ -184,21 +200,7 @@ const EmployeeDashboard = ({
             <div className="stat-label">Services Completed</div>
           </div>
           
-          <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-            <button 
-              className="action-button"
-              onClick={() => setShowRegisteredCitizens(true)}
-              style={{
-                padding: '0.875rem 2rem',
-                fontSize: '1rem',
-                fontWeight: '600',
-                background: 'linear-gradient(135deg, var(--accent-green) 0%, #1e7e1e 100%)',
-                boxShadow: '0 4px 12px rgba(34, 139, 34, 0.3)'
-              }}
-            >
-              View Registered Citizens ({citizenDatabase.length})
-            </button>
-          </div>
+
 
           {appointments
             .filter(apt => apt.assignedBooth === currentUser.boothId && apt.status === 'completed')

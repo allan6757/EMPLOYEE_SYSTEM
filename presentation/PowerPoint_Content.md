@@ -134,21 +134,7 @@ Project: Employee & Citizen Management System
 
 ---
 
-## SLIDE 10: DEMONSTRATION HIGHLIGHTS
-
-**LIVE DEMO INCLUDES:**
-- Citizen login and service booking
-- Employee booth management
-- Admin system oversight
-- Document tracking workflow
-- Digital ID generation
-- Real-time chat functionality
-
-**TEST DATA:** Pre-loaded with sample citizens and employees
-
----
-
-## SLIDE 11: IMPACT & RESULTS
+## SLIDE 10: IMPACT & RESULTS
 
 **EXPECTED IMPROVEMENTS:**
 - 70% reduction in waiting times
@@ -161,19 +147,7 @@ Project: Employee & Citizen Management System
 
 ---
 
-## SLIDE 12: FUTURE ENHANCEMENTS
-
-**NEXT PHASE:**
-- SMS notifications
-- Email integration
-- Mobile app development
-- Biometric scanner integration
-- Cloud database migration
-- Multi-language support
-
----
-
-## SLIDE 13: CONCLUSION
+## SLIDE 11: CONCLUSION
 
 **PROJECT SUMMARY:**
 - Identified real-world problems at National Registration Bureau
@@ -186,9 +160,9 @@ Project: Employee & Citizen Management System
 
 ---
 
-## SLIDE 14: THANK YOU
+## SLIDE 12: THANK YOU
 
-**QUESTIONS & DISCUSSION**
+**QUESTIONS**
 
 *Nairobi Registration Bureau*
 *Digital Service System*
