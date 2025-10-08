@@ -430,17 +430,23 @@ const App = () => {
 
   // Authentication Functions
   const handleEmployeeLogin = () => {
-    const booth = booths.find(b => b.id === loginForm.boothId);
-    const employee = employees.find(emp => emp.boothId === loginForm.boothId && emp.password === loginForm.password);
+    const boothId = loginForm.boothId.trim().toUpperCase();
+    const password = loginForm.password.trim();
+    
+    const booth = booths.find(b => b.id.toUpperCase() === boothId);
+    const employee = employees.find(emp => 
+      emp.boothId.toUpperCase() === boothId && emp.password === password
+    );
 
     if (booth && employee) {
       setCurrentUser({ ...employee, booth });
-      setActiveBooths(prev => new Set([...prev, loginForm.boothId]));
+      setActiveBooths(prev => new Set([...prev, booth.id]));
       setViewMode('employee-dashboard');
       setShowEmployeeLogin(false);
+      setLoginForm({ boothId: '', password: '' });
       showPopup(`Welcome ${employee.name}! Logged into ${booth.name}`, 'success');
     } else {
-      showPopup('Invalid booth ID or password.', 'error');
+      showPopup(`Invalid credentials. Try: B002/emp123, B001/emp456, or B003/emp789`, 'error');
     }
   };
 
