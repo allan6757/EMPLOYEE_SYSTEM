@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ChatModal from '../Layout/ChatModal';
 import TopNavigation from '../Layout/TopNavigation';
+import RegisteredCitizens from '../Layout/RegisteredCitizens';
 
 const EmployeeDashboard = ({ 
   currentUser, 
@@ -25,6 +26,18 @@ const EmployeeDashboard = ({
   showBiometricSearch,
   setShowBiometricSearch
 }) => {
+  const [showRegisteredCitizens, setShowRegisteredCitizens] = useState(false);
+  
+  if (showRegisteredCitizens) {
+    return (
+      <RegisteredCitizens 
+        citizenDatabase={citizenDatabase}
+        onBack={() => setShowRegisteredCitizens(false)}
+        title={`Registered Citizens - ${currentUser.name}`}
+      />
+    );
+  }
+  
   return (
     <div>
       <TopNavigation 
@@ -125,7 +138,7 @@ const EmployeeDashboard = ({
                 }}
                 style={{ padding: '8px 16px', fontSize: '0.9rem' }}
               >
-                🔍
+                Search
               </button>
             </div>
           </div>
@@ -169,6 +182,22 @@ const EmployeeDashboard = ({
                serviceRecords.filter(s => s.employeeId === currentUser.id && s.date === getFormattedDate()).length}
             </div>
             <div className="stat-label">Services Completed</div>
+          </div>
+          
+          <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+            <button 
+              className="action-button"
+              onClick={() => setShowRegisteredCitizens(true)}
+              style={{
+                padding: '0.875rem 2rem',
+                fontSize: '1rem',
+                fontWeight: '600',
+                background: 'linear-gradient(135deg, var(--accent-green) 0%, #1e7e1e 100%)',
+                boxShadow: '0 4px 12px rgba(34, 139, 34, 0.3)'
+              }}
+            >
+              View Registered Citizens ({citizenDatabase.length})
+            </button>
           </div>
 
           {appointments

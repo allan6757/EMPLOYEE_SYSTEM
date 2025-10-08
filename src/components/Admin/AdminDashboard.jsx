@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ChatModal from '../Layout/ChatModal';
 import TopNavigation from '../Layout/TopNavigation';
+import RegisteredCitizens from '../Layout/RegisteredCitizens';
 
 const AdminDashboard = ({ 
   booths, 
@@ -34,6 +35,17 @@ const AdminDashboard = ({
   setNewMessage
 }) => {
   const adminUser = { name: 'Admin', booth: { name: 'Control Panel' } };
+  const [showRegisteredCitizens, setShowRegisteredCitizens] = useState(false);
+  
+  if (showRegisteredCitizens) {
+    return (
+      <RegisteredCitizens 
+        citizenDatabase={citizenDatabase}
+        onBack={() => setShowRegisteredCitizens(false)}
+        title="Registered Citizens - Admin View"
+      />
+    );
+  }
   
   return (
     <div>
@@ -214,7 +226,7 @@ const AdminDashboard = ({
                 }}
                 style={{ padding: '8px 16px', fontSize: '0.9rem' }}
               >
-                🔍 Search
+                Search
               </button>
             </div>
           </div>
@@ -297,6 +309,22 @@ const AdminDashboard = ({
               <div className="stat-number">{serviceRecords.filter(s => s.date === getFormattedDate()).length}</div>
               <div className="stat-label">Today's Services</div>
             </div>
+          </div>
+          
+          <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+            <button 
+              className="action-button"
+              onClick={() => setShowRegisteredCitizens(true)}
+              style={{
+                padding: '0.875rem 2rem',
+                fontSize: '1rem',
+                fontWeight: '600',
+                background: 'linear-gradient(135deg, var(--accent-red) 0%, #b91c1c 100%)',
+                boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)'
+              }}
+            >
+              View Registered Citizens ({citizenDatabase.length})
+            </button>
           </div>
         </div>
       </div>

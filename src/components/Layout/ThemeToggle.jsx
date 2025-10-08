@@ -6,8 +6,15 @@ const ThemeToggle = ({ theme, toggleTheme }) => {
       onClick={toggleTheme}
       className="theme-toggle"
       title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+      style={{
+        fontSize: '0.8rem',
+        fontWeight: '600',
+        width: '60px',
+        height: '30px',
+        borderRadius: '15px'
+      }}
     >
-      {theme === 'dark' ? '☀️' : '🌙'}
+      {theme === 'dark' ? 'Light' : 'Dark'}
     </button>
   );
 };

@@ -20,39 +20,46 @@ export const globalStyles = `
 }
 
 [data-theme="light"] {
-  /* Light theme variables - Kenya Flag Inspired */
+  /* Light theme variables - Bright Kenya Flag Inspired */
   --bg-primary: linear-gradient(135deg, 
-    #fefefe 0%, 
-    #fef7f7 15%, 
-    #ffffff 30%, 
-    #f8fffe 45%, 
+    #ffffff 0%, 
+    #fff5f5 10%, 
+    #ffffff 20%, 
+    #f0fff0 30%, 
+    #ffffff 40%, 
+    #fff8f8 50%, 
     #ffffff 60%, 
-    #f7fef7 75%, 
-    #fefefe 100%
+    #f8fff8 70%, 
+    #ffffff 80%, 
+    #fffafa 90%, 
+    #ffffff 100%
   );
-  --bg-secondary: rgba(255, 255, 255, 0.98);
+  --bg-secondary: rgba(255, 255, 255, 0.99);
   --bg-card: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.95) 0%, 
-    rgba(254, 249, 249, 0.9) 25%, 
-    rgba(255, 255, 255, 0.95) 50%, 
-    rgba(248, 254, 248, 0.9) 75%, 
-    rgba(255, 255, 255, 0.95) 100%
+    rgba(255, 255, 255, 0.98) 0%, 
+    rgba(255, 250, 250, 0.95) 20%, 
+    rgba(255, 255, 255, 0.98) 40%, 
+    rgba(248, 255, 248, 0.95) 60%, 
+    rgba(255, 255, 255, 0.98) 80%, 
+    rgba(250, 255, 250, 0.95) 100%
   );
   --bg-section: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.96) 0%, 
-    rgba(254, 250, 250, 0.92) 50%, 
-    rgba(255, 255, 255, 0.96) 100%
+    rgba(255, 255, 255, 0.99) 0%, 
+    rgba(254, 252, 252, 0.96) 25%, 
+    rgba(255, 255, 255, 0.99) 50%, 
+    rgba(252, 254, 252, 0.96) 75%, 
+    rgba(255, 255, 255, 0.99) 100%
   );
-  --bg-input: rgba(255, 255, 255, 0.98);
-  --text-primary: #0f172a;
-  --text-secondary: #1e293b;
-  --text-muted: #475569;
-  --border-primary: rgba(220, 38, 38, 0.5);
-  --border-secondary: rgba(148, 163, 184, 0.8);
-  --accent-red: #dc2626;
-  --accent-green: #16a34a;
-  --shadow-primary: rgba(0, 0, 0, 0.15);
-  --shadow-secondary: rgba(0, 0, 0, 0.08);
+  --bg-input: rgba(255, 255, 255, 0.99);
+  --text-primary: #1a202c;
+  --text-secondary: #2d3748;
+  --text-muted: #4a5568;
+  --border-primary: rgba(220, 38, 38, 0.6);
+  --border-secondary: rgba(160, 174, 192, 0.9);
+  --accent-red: #e53e3e;
+  --accent-green: #38a169;
+  --shadow-primary: rgba(0, 0, 0, 0.2);
+  --shadow-secondary: rgba(0, 0, 0, 0.12);
 }
 
 * {
@@ -82,9 +89,11 @@ body, .app-container {
 [data-theme="light"] body,
 [data-theme="light"] .app-container {
   background: var(--bg-primary),
-             radial-gradient(circle at 15% 25%, rgba(220, 38, 38, 0.03) 0%, transparent 40%),
-             radial-gradient(circle at 85% 75%, rgba(34, 139, 34, 0.03) 0%, transparent 40%),
-             radial-gradient(circle at 50% 10%, rgba(0, 0, 0, 0.02) 0%, transparent 30%);
+             radial-gradient(circle at 15% 25%, rgba(220, 38, 38, 0.05) 0%, transparent 35%),
+             radial-gradient(circle at 85% 75%, rgba(34, 139, 34, 0.05) 0%, transparent 35%),
+             radial-gradient(circle at 50% 10%, rgba(0, 0, 0, 0.03) 0%, transparent 25%),
+             radial-gradient(circle at 25% 75%, rgba(255, 255, 255, 0.8) 0%, transparent 20%),
+             radial-gradient(circle at 75% 25%, rgba(255, 255, 255, 0.6) 0%, transparent 15%);
 }
 
 [data-theme="dark"] body::before,
@@ -113,10 +122,11 @@ body, .app-container {
   width: 100%;
   height: 100%;
   background-image: 
-    radial-gradient(circle at 20% 30%, rgba(220, 38, 38, 0.02) 0%, transparent 30%),
-    radial-gradient(circle at 80% 70%, rgba(34, 139, 34, 0.02) 0%, transparent 30%),
-    linear-gradient(45deg, transparent 48%, rgba(0, 0, 0, 0.01) 49%, rgba(0, 0, 0, 0.01) 51%, transparent 52%);
-  background-size: 300px 300px, 300px 300px, 80px 80px;
+    radial-gradient(circle at 20% 30%, rgba(220, 38, 38, 0.04) 0%, transparent 25%),
+    radial-gradient(circle at 80% 70%, rgba(34, 139, 34, 0.04) 0%, transparent 25%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.3) 0%, transparent 20%),
+    linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.05) 49%, rgba(255, 255, 255, 0.05) 51%, transparent 52%);
+  background-size: 250px 250px, 250px 250px, 400px 400px, 60px 60px;
   pointer-events: none;
   z-index: -1;
 }
@@ -591,17 +601,20 @@ body, .app-container {
   z-index: 1000;
   background: var(--bg-card);
   border: 2px solid var(--border-primary);
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
+  border-radius: 20px;
+  min-width: 60px;
+  height: 35px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 0.8rem;
+  font-weight: 600;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 12px var(--shadow-secondary);
+  color: var(--text-primary);
+  padding: 0 0.5rem;
 }
 
 .theme-toggle:hover {

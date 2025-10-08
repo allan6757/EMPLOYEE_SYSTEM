@@ -134,7 +134,7 @@ const RegistrationForm = ({
             cursor: 'pointer',
             userSelect: 'none'
           }}>
-            🔐 Request Biometric Key (Enhanced Security)
+            Request Biometric Key (Enhanced Security)
           </label>
         </div>
         <p style={{ 
