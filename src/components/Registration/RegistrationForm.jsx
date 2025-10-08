@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 
 const RegistrationForm = ({ 
   registrationForm, 
@@ -6,6 +6,11 @@ const RegistrationForm = ({
   registerCitizen, 
   showPopup 
 }) => {
+  const [showCamera, setShowCamera] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(false);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const clearForm = () => {
     setRegistrationForm({
@@ -13,6 +18,61 @@ const RegistrationForm = ({
       nationality: 'Kenyan', gender: '', phoneNumber: '', email: '',
       address: '', nextOfKin: '', fingerprint: '', photo: '', requestBiometric: false
     });
+  };
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      setShowCamera(true);
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      }, 100);
+    } catch (error) {
+      showPopup('Camera access denied or not available', 'error');
+    }
+  };
+
+  const capturePhoto = () => {
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+    const context = canvas.getContext('2d');
+    
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    context.drawImage(video, 0, 0);
+    
+    const photoData = canvas.toDataURL('image/jpeg', 0.8);
+    setRegistrationForm({ ...registrationForm, photo: photoData });
+    
+    // Stop camera
+    const stream = video.srcObject;
+    const tracks = stream.getTracks();
+    tracks.forEach(track => track.stop());
+    setShowCamera(false);
+  };
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setRegistrationForm({ ...registrationForm, photo: e.target.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const retakePhoto = () => {
+    if (!isRegistered) {
+      setRegistrationForm({ ...registrationForm, photo: '' });
+    }
+  };
+
+  const handleRegisterCitizen = () => {
+    registerCitizen();
+    setIsRegistered(true);
   };
 
   return (
@@ -108,6 +168,97 @@ const RegistrationForm = ({
               onChange={(e) => setRegistrationForm({ ...registrationForm, fingerprint: e.target.value })}
             />
           </div>
+          
+          <div className="form-group">
+            <label className="form-label">ID Photo *</label>
+            {!registrationForm.photo ? (
+              <div style={{ display: 'flex', gap: '10px', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button
+                    type="button"
+                    onClick={startCamera}
+                    style={{
+                      flex: 1,
+                      padding: '12px',
+                      background: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      fontWeight: '600'
+                    }}
+                  >
+                    📷 Take Photo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    style={{
+                      flex: 1,
+                      padding: '12px',
+                      background: 'linear-gradient(135deg, #27ae60 0%, #229954 100%)',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      fontWeight: '600'
+                    }}
+                  >
+                    📁 Upload Photo
+                  </button>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  style={{ display: 'none' }}
+                />
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center' }}>
+                <img
+                  src={registrationForm.photo}
+                  alt="ID Photo"
+                  style={{
+                    width: '120px',
+                    height: '120px',
+                    objectFit: 'cover',
+                    borderRadius: '8px',
+                    border: '2px solid #228b22',
+                    marginBottom: '10px'
+                  }}
+                />
+                <div>
+                  {!isRegistered && (
+                    <button
+                      type="button"
+                      onClick={retakePhoto}
+                      style={{
+                        padding: '8px 16px',
+                        background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                        color: '#ffffff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '0.85rem',
+                        fontWeight: '600'
+                      }}
+                    >
+                      🔄 Retake Photo
+                    </button>
+                  )}
+                  {isRegistered && (
+                    <p style={{ color: '#228b22', fontSize: '0.85rem', marginTop: '5px' }}>
+                      ✅ Photo locked after registration
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -148,13 +299,104 @@ const RegistrationForm = ({
       </div>
 
       <div className="button-group">
-        <button className="action-button" onClick={registerCitizen}>
-          Register Citizen
+        <button 
+          className="action-button" 
+          onClick={handleRegisterCitizen}
+          disabled={isRegistered}
+          style={{
+            opacity: isRegistered ? 0.6 : 1,
+            cursor: isRegistered ? 'not-allowed' : 'pointer'
+          }}
+        >
+          {isRegistered ? 'Citizen Registered' : 'Register Citizen'}
         </button>
-        <button className="action-button secondary-button" onClick={clearForm}>
+        <button 
+          className="action-button secondary-button" 
+          onClick={() => {
+            clearForm();
+            setIsRegistered(false);
+          }}
+        >
           Clear Form
         </button>
       </div>
+      
+      {showCamera && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0, 0, 0, 0.9)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '15px',
+            padding: '20px',
+            textAlign: 'center',
+            maxWidth: '500px',
+            width: '90%'
+          }}>
+            <h3 style={{ color: '#333', marginBottom: '15px' }}>Take ID Photo</h3>
+            <video
+              ref={videoRef}
+              autoPlay
+              style={{
+                width: '100%',
+                maxWidth: '300px',
+                height: '200px',
+                objectFit: 'cover',
+                borderRadius: '8px',
+                marginBottom: '15px'
+              }}
+            />
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <button
+                onClick={capturePhoto}
+                style={{
+                  padding: '12px 24px',
+                  background: '#228b22',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: '600'
+                }}
+              >
+                📸 Capture
+              </button>
+              <button
+                onClick={() => {
+                  const stream = videoRef.current?.srcObject;
+                  if (stream) {
+                    const tracks = stream.getTracks();
+                    tracks.forEach(track => track.stop());
+                  }
+                  setShowCamera(false);
+                }}
+                style={{
+                  padding: '12px 24px',
+                  background: '#dc2626',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: '600'
+                }}
+              >
+                ❌ Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
     </div>
   );
 };

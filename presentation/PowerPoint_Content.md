@@ -5,12 +5,12 @@
 
 ## SLIDE 1: TITLE
 **NAIROBI REGISTRATION BUREAU**
-**DIGITAL SERVICE SYSTEM**
+**DIGITAL IDENTITY & CITIZEN SERVICES PLATFORM**
 
 *Simplifying Citizen Services Through Technology*
 
-Student: [Your Name]
-Project: Employee & Citizen Management System
+Student: ALLAN MAINA 23-1446
+Project: Modern Digital Identity Management
 
 ---
 
@@ -71,16 +71,16 @@ Project: Employee & Citizen Management System
 ## SLIDE 6: KEY FEATURES IMPLEMENTED
 
 **FOR CITIZENS:**
-- Digital ID display with QR codes
+- Digital ID with photo display
 - Appointment booking system
 - Document status tracking
 - Lost ID reporting
-- Queue management
+- Photo capture & upload
 
 **FOR EMPLOYEES:**
 - Booth management dashboard
+- Personal notes system
 - Citizen verification tools
-- Service processing interface
 - Real-time chat system
 
 ---
@@ -124,13 +124,13 @@ Project: Employee & Citizen Management System
 
 **CORE FEATURES:**
 - Multi-level authentication
-- Biometric key generation
+- Photo capture & upload system
+- Personal notes with pin functionality
 - Document production tracking
 - Queue management system
-- Real-time notifications
 - Mobile-responsive design
 
-**SECURITY:** Fraud detection, secure login, data protection
+**SECURITY:** Photo protection, fraud detection, secure login
 
 ---
 

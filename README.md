@@ -1,6 +1,6 @@
-# Nairobi Registration Bureau - Booth Management & Service System
+# Nairobi Registration Bureau - Digital Identity & Citizen Services Platform
 
-A comprehensive digital identity management system for the Nairobi Registration Bureau, built with React and Vite. This system manages citizen services, employee operations, and administrative oversight for national ID registration and related services.
+A comprehensive digital identity management system for the Nairobi Registration Bureau, built with React and Vite. This modern platform manages citizen services, employee operations, and administrative oversight for national ID registration with photo capture and personal notes functionality.
 
 ## 🚀 Features
 
@@ -18,7 +18,9 @@ A comprehensive digital identity management system for the Nairobi Registration 
 - Digital ID with security features (hologram, watermark, RFID chip)
 
 ### 📱 Digital Services
-- Digital ID display with QR codes
+- Digital ID with photo display
+- Photo capture & upload system
+- Personal notes with pin functionality
 - Document production tracking
 - Lost ID reporting system
 - Real-time chat communication

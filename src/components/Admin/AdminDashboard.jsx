@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import ChatModal from '../Layout/ChatModal';
 import TopNavigation from '../Layout/TopNavigation';
 import RegisteredCitizens from '../Layout/RegisteredCitizens';
+import NotesModal from '../Layout/NotesModal';
 
 const AdminDashboard = ({ 
   booths, 
@@ -36,6 +37,7 @@ const AdminDashboard = ({
 }) => {
   const adminUser = { name: 'Admin', booth: { name: 'Control Panel' } };
   const [showRegisteredCitizens, setShowRegisteredCitizens] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
   
   if (showRegisteredCitizens) {
     return (
@@ -57,7 +59,7 @@ const AdminDashboard = ({
         onBackToServices={onBackToServices}
       />
 
-      <div style={{ padding: '1rem', textAlign: 'center', background: 'rgba(31, 31, 31, 0.8)', borderBottom: '1px solid rgba(55, 55, 55, 0.5)' }}>
+      <div style={{ padding: '1rem', textAlign: 'center', background: 'rgba(31, 31, 31, 0.8)', borderBottom: '1px solid rgba(55, 55, 55, 0.5)', display: 'flex', gap: '15px', justifyContent: 'center', alignItems: 'center' }}>
         <button 
           className="action-button"
           onClick={() => setShowRegisteredCitizens(true)}
@@ -70,6 +72,25 @@ const AdminDashboard = ({
           }}
         >
           Search Registered Citizens ({citizenDatabase.length})
+        </button>
+        <button 
+          onClick={() => setShowNotes(true)}
+          style={{
+            padding: '0.875rem 1rem',
+            fontSize: '1.2rem',
+            background: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)',
+            color: '#ffffff',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(52, 152, 219, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+          title="My Notes"
+        >
+          📝
         </button>
       </div>
 
@@ -343,6 +364,12 @@ const AdminDashboard = ({
           sendMessage={sendAdminMessage}
         />
       )}
+
+      <NotesModal 
+        showNotes={showNotes}
+        setShowNotes={setShowNotes}
+        currentUser={adminUser}
+      />
     </div>
   );
 };

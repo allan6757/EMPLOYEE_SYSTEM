@@ -583,11 +583,16 @@ const App = () => {
 
   // Registration Functions
   const registerCitizen = () => {
-    const requiredFields = ['firstName', 'lastName', 'gender', 'phoneNumber'];
+    const requiredFields = ['firstName', 'lastName', 'gender', 'phoneNumber', 'photo'];
     const missingFields = requiredFields.filter(field => !registrationForm[field]);
 
     if (missingFields.length > 0) {
       setMessage(`Please fill required fields: ${missingFields.join(', ')}`);
+      return;
+    }
+
+    if (!registrationForm.photo) {
+      setMessage('Please take or upload a photo for the ID');
       return;
     }
 
@@ -614,8 +619,10 @@ const App = () => {
       biometricKey,
       registrationDate: getFormattedDate(),
       registrationTime: getFormattedTime(),
-      status: 'registered',
-      documentStatus: 'pending_production',
+      status: 'active',
+      documentStatus: 'issued',
+      issueDate: getFormattedDate(),
+      expiryDate: new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       registeredBy: currentUser?.id || 'system'
     };
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import ChatModal from '../Layout/ChatModal';
 import TopNavigation from '../Layout/TopNavigation';
 import RegisteredCitizens from '../Layout/RegisteredCitizens';
+import NotesModal from '../Layout/NotesModal';
 
 const EmployeeDashboard = ({ 
   currentUser, 
@@ -27,6 +28,7 @@ const EmployeeDashboard = ({
   setShowBiometricSearch
 }) => {
   const [showRegisteredCitizens, setShowRegisteredCitizens] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
   
   if (showRegisteredCitizens) {
     return (
@@ -48,7 +50,7 @@ const EmployeeDashboard = ({
         onBackToServices={onBackToServices}
       />
 
-      <div style={{ padding: '1rem', textAlign: 'center', background: 'rgba(31, 31, 31, 0.8)', borderBottom: '1px solid rgba(55, 55, 55, 0.5)' }}>
+      <div style={{ padding: '1rem', textAlign: 'center', background: 'rgba(31, 31, 31, 0.8)', borderBottom: '1px solid rgba(55, 55, 55, 0.5)', display: 'flex', gap: '15px', justifyContent: 'center', alignItems: 'center' }}>
         <button 
           className="action-button"
           onClick={() => setShowRegisteredCitizens(true)}
@@ -62,10 +64,29 @@ const EmployeeDashboard = ({
         >
           Search Registered Citizens ({citizenDatabase.length})
         </button>
+        <button 
+          onClick={() => setShowNotes(true)}
+          style={{
+            padding: '0.875rem 1rem',
+            fontSize: '1.2rem',
+            background: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)',
+            color: '#ffffff',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(52, 152, 219, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+          title="My Notes"
+        >
+          📝
+        </button>
       </div>
 
       <div className="grid">
-        <div className="section">
+        <div className="section" style={{ gridColumn: 'span 2' }}>
           <h3>All Appointments</h3>
           {appointments
             .filter(apt => apt.assignedBooth === currentUser.boothId)
@@ -118,77 +139,7 @@ const EmployeeDashboard = ({
           )}
         </div>
 
-        <div className="section">
-          <h3>Biometric Key Lookup</h3>
-          <div className="form-group">
-            <label className="form-label">Search Citizen Biometric Key</label>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-              <input
-                className="input-field"
-                placeholder="Enter ID number or citizen name"
-                value={biometricSearch}
-                onChange={(e) => {
-                  setBiometricSearch(e.target.value);
-                  if (e.target.value.length >= 2) {
-                    const results = citizenDatabase.filter(citizen => 
-                      citizen.idNumber.includes(e.target.value) ||
-                      citizen.firstName.toLowerCase().includes(e.target.value.toLowerCase()) ||
-                      citizen.lastName.toLowerCase().includes(e.target.value.toLowerCase())
-                    );
-                    setBiometricResults ? setBiometricResults(results) : null;
-                  } else {
-                    setBiometricResults ? setBiometricResults([]) : null;
-                  }
-                }}
-                style={{ flex: 1 }}
-              />
-              <button 
-                className="action-button"
-                onClick={() => {
-                  const results = citizenDatabase.filter(citizen => 
-                    citizen.idNumber.includes(biometricSearch) ||
-                    citizen.firstName.toLowerCase().includes(biometricSearch.toLowerCase()) ||
-                    citizen.lastName.toLowerCase().includes(biometricSearch.toLowerCase())
-                  );
-                  setBiometricResults ? setBiometricResults(results) : null;
-                }}
-                style={{ padding: '8px 16px', fontSize: '0.9rem' }}
-              >
-                Search
-              </button>
-            </div>
-          </div>
-          
-          {biometricResults && biometricResults.length > 0 && (
-            <div style={{ marginTop: '15px', maxHeight: '200px', overflowY: 'auto' }}>
-              {biometricResults.slice(0, 3).map(citizen => (
-                <div key={citizen.id} style={{
-                  background: 'rgba(34, 139, 34, 0.1)',
-                  border: '1px solid rgba(34, 139, 34, 0.3)',
-                  borderRadius: '8px',
-                  padding: '10px',
-                  marginBottom: '8px',
-                  fontSize: '0.9rem'
-                }}>
-                  <strong>{citizen.firstName} {citizen.lastName}</strong> (ID: {citizen.idNumber})<br/>
-                  {citizen.biometricKey ? (
-                    <code style={{ 
-                      background: 'rgba(0,0,0,0.3)', 
-                      padding: '2px 6px', 
-                      borderRadius: '4px',
-                      fontSize: '0.8rem',
-                      color: '#00ff00'
-                    }}>
-                      {citizen.biometricKey}
-                    </code>
-                  ) : (
-                    <span style={{ color: '#ff6b6b' }}>No Biometric Key</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+
 
         <div className="section">
           <h3>Today's Services</h3>
@@ -232,6 +183,12 @@ const EmployeeDashboard = ({
           title="Chat with Admin"
         />
       )}
+
+      <NotesModal 
+        showNotes={showNotes}
+        setShowNotes={setShowNotes}
+        currentUser={currentUser}
+      />
     </div>
   );
 };

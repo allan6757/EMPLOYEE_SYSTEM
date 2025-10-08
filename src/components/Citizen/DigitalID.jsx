@@ -45,9 +45,22 @@ const DigitalID = ({ citizen }) => {
           alignItems: 'center',
           justifyContent: 'center',
           fontSize: '1rem',
-          fontWeight: 'bold'
+          fontWeight: 'bold',
+          overflow: 'hidden'
         }}>
-          PHOTO
+          {citizen.photo ? (
+            <img
+              src={citizen.photo}
+              alt="ID Photo"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }}
+            />
+          ) : (
+            'PHOTO'
+          )}
         </div>
         
         <div style={{ flex: 1 }}>
