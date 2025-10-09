@@ -109,6 +109,7 @@ const CitizenServices = ({
         <input
           type="date"
           className="input-field"
+          min={new Date().toISOString().split('T')[0]}
           value={citizenForm.appointmentDate}
           onChange={(e) => setCitizenForm({ ...citizenForm, appointmentDate: e.target.value })}
         />

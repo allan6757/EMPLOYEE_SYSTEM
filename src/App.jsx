@@ -538,6 +538,16 @@ const App = () => {
       return;
     }
 
+    // Validate appointment date is not in the past
+    const selectedDate = new Date(citizenForm.appointmentDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
+    
+    if (selectedDate < today) {
+      showPopup('Cannot book appointment for a past date. Please select today or a future date.', 'error');
+      return;
+    }
+
     const optimalBooth = findOptimalBooth(booths, employees, citizenQueue, citizenForm.serviceType);
     if (!optimalBooth) {
       setMessage('No available booth for this service');
