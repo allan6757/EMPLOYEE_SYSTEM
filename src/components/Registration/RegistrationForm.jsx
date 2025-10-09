@@ -160,12 +160,13 @@ const RegistrationForm = ({
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Biometric Data</label>
+            <label className="form-label">Biometric Data *</label>
             <input
               className="input-field"
-              placeholder="Fingerprint scan code"
+              placeholder="Fingerprint scan code (Required)"
               value={registrationForm.fingerprint}
               onChange={(e) => setRegistrationForm({ ...registrationForm, fingerprint: e.target.value })}
+              required
             />
           </div>
           
@@ -302,10 +303,10 @@ const RegistrationForm = ({
         <button 
           className="action-button" 
           onClick={handleRegisterCitizen}
-          disabled={isRegistered}
+          disabled={isRegistered || !registrationForm.fingerprint}
           style={{
-            opacity: isRegistered ? 0.6 : 1,
-            cursor: isRegistered ? 'not-allowed' : 'pointer'
+            opacity: (isRegistered || !registrationForm.fingerprint) ? 0.6 : 1,
+            cursor: (isRegistered || !registrationForm.fingerprint) ? 'not-allowed' : 'pointer'
           }}
         >
           {isRegistered ? 'Citizen Registered' : 'Register Citizen'}

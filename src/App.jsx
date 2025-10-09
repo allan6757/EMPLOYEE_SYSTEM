@@ -583,7 +583,7 @@ const App = () => {
 
   // Registration Functions
   const registerCitizen = () => {
-    const requiredFields = ['firstName', 'lastName', 'gender', 'phoneNumber', 'photo'];
+    const requiredFields = ['firstName', 'lastName', 'gender', 'phoneNumber', 'photo', 'fingerprint'];
     const missingFields = requiredFields.filter(field => !registrationForm[field]);
 
     if (missingFields.length > 0) {
@@ -593,6 +593,11 @@ const App = () => {
 
     if (!registrationForm.photo) {
       setMessage('Please take or upload a photo for the ID');
+      return;
+    }
+
+    if (!registrationForm.fingerprint) {
+      setMessage('Fingerprint scan code is required for registration');
       return;
     }
 
